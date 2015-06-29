@@ -25,7 +25,14 @@ namespace Pavillion2015.Gene_UpdatedCode
         double iTangentScaleMax = double.NaN;
         List<Point3d> iAttractors = null;
         List<Point3d> iClosedPanelPts = null;
-        double iClosePanelDist = 0.001; 
+        double iClosePanelDist = 0.001;
+
+        //=================================== EDITED BY JULIAN =========================================
+        double iPlanarOffsetScaleMin = double.NaN;
+        double iPlanarOffsetScaleMax = double.NaN;
+
+        double CurvePointiness = double.NaN;
+        //=================================== END EDITED BY JULIAN =====================================
 
         // output
         string oInfo = string.Empty;
@@ -54,7 +61,20 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         List<int[]> indexSortPolygon = null;
 
+        //=================================== EDITED BY JULIAN =========================================
+        // General Distance Relation to Attractor(s) ( before remaping to Min/Max - Range )
         List<double> verticesValues = null;
+
+        // relative offset factors for individual opnening sizes (remaped verticesValues to iTangentScaleMin - iTangentScaleMax - range)
+        List<double> curveVerticesValues = null;
+
+        // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
+        List<double> planarVerticesValues = null;
+
+        // opens or closes openings (Plate "Type 2")
+        List<bool> openClose = null;
+
+        //=================================== END EDITED BY JULIAN =====================================
 
         double documentTolerance = DocumentTolerance();
 
@@ -70,17 +90,27 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
+            //=================================== EDITED BY JULIAN =========================================
+
             pManager.AddGenericParameter("Spring Mesh", "Spring Mesh", "Spring Mesh", GH_ParamAccess.item);
-            pManager.AddCurveParameter("PolyLine", "PolyLine", "PolyLine", GH_ParamAccess.list);
-            pManager.AddNumberParameter("Thickness", "Thickness", "Thickness", GH_ParamAccess.list);
+            pManager.AddCurveParameter("PolyLine", "PolyLine", "PolyLine from Plate", GH_ParamAccess.list);
+            pManager.AddNumberParameter("Thickness", "Thickness", "Thickness of Component", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Vertex status", "Vertex status", "Vertex status", GH_ParamAccess.list);
             pManager.AddIntegerParameter("PolyLine ID", "PolyLine ID", "PolyLine ID", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Allow PolySrf", "Allow PolySrf", "Allow PolySrf", GH_ParamAccess.item, true);
-            pManager.AddNumberParameter("TangentScale Min", "TangentScale Min", "TangentScale Min", GH_ParamAccess.item, 0.2);
-            pManager.AddNumberParameter("TangentScale Max", "TangentScale Max", "TangentScale Max", GH_ParamAccess.item, 0.8);
+            pManager.AddNumberParameter("TangentScale Min", "TangentScale Min", "TangentScale Min [relative]", GH_ParamAccess.item, 0.2);
+            pManager.AddNumberParameter("TangentScale Max", "TangentScale Max", "TangentScale Max [relative]", GH_ParamAccess.item, 0.8);
+            pManager.AddNumberParameter("Curve Pointiness", "Pointiness", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("PlanarOffset Min", "PlanarOffset Min", "Controlls minimal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.2);
+            pManager.AddNumberParameter("PlanarOffset Max", "PlanarOffset Max", "Controlls maximal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.8);
+            pManager.AddBooleanParameter("Open/Close", "O/C", "Open or close an opening", GH_ParamAccess.list);
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list);
+
+            //=================================== END EDITED BY JULIAN =====================================
+
             pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
             pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
+
         }
 
 
