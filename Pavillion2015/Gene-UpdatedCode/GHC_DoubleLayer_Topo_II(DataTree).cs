@@ -74,7 +74,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<double> planarVerticesValues = null;
 
         // opens or closes openings (Plate "Type 2")
-        List<bool> openClose = null;
+        //List<bool> openClose = null;
 
         //=================================== END EDITED BY JULIAN =====================================
 
@@ -105,7 +105,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddNumberParameter("Curve Pointiness", "Pointiness", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
             pManager.AddNumberParameter("PlanarOffset Min", "PlanarOffset Min", "Controlls minimal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("PlanarOffset Max", "PlanarOffset Max", "Controlls maximal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.8);
-            pManager.AddBooleanParameter("Open/Close", "O/C", "Open or close an opening", GH_ParamAccess.list);
+            //pManager.AddBooleanParameter("Open/Close", "O/C", "Open or close an opening", GH_ParamAccess.list);
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list);
 
             //=================================== END EDITED BY JULIAN =====================================
@@ -174,7 +174,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             verticesValues = new List<double>();
             curveVerticesValues = new List<double>();
             planarVerticesValues = new List<double>();
-            openClose = new List<bool>();
+            //openClose = new List<bool>();
 
             //=================================== END EDITED BY JULIAN =====================================
         }
@@ -199,7 +199,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             DA.GetData<double>("PlanarOffset Min", ref iPlanarOffsetScaleMin);
             DA.GetData<double>("PlanarOffset Max", ref iPlanarOffsetScaleMax);
-            DA.GetDataList<bool>("Open/Close", openClose);
+            //DA.GetDataList<bool>("Open/Close", openClose);
             DA.GetData<double>("Curve Pointiness", ref CurvePointiness);
 
             //=================================== END EDITED BY JULIAN =====================================
@@ -479,6 +479,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             int vertex2 = edge.SecondVertexIndex;
 
             int vertex = vertex1;
+            int occupyiedVertex = vertex2;
 
             if (iVertexStatus[vertex1] == false && iVertexStatus[vertex2] == true) { vertex = vertex1; }
             else if (iVertexStatus[vertex2] == false && iVertexStatus[vertex1] == true) { vertex = vertex2; }
@@ -565,6 +566,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             // compare their polygon index to sort the lofting sequence 
             #region compair polygon index
 
+            // dataTree 
+            int plateID = iPolyLineID[occupyiedVertex];
+
+            GH_Path path = new GH_Path(plateID);
+
             int[] rightIndex = indexSortPolygon[rightTriIndex];
             int[] leftIndex = indexSortPolygon[leftTriIndex];
 
@@ -581,7 +587,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 false
                                 );
                             if (brep.Length > 0)
-                                oDualLoop.Add(brep[0]);
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path);
+                            }
                         }
                         else if ((rightIndex[r + 3] == 0 && leftIndex[l + 3] != 1) ||
                                  (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] >= leftIndex[l + 3]))
@@ -593,7 +605,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 false
                                 );
                             if (brep.Length > 0)
-                                oDualLoop.Add(brep[0]);
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path);
+                            }
                         }
                         else if (rightIndex[r + 3] >= leftIndex[l + 3])
                         {
@@ -604,7 +622,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 false
                                 );
                             if (brep.Length > 0)
-                                oDualLoop.Add(brep[0]);
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path);
+                            }
                         }
                         else if (rightIndex[r + 3] < leftIndex[l + 3])
                         {
@@ -615,7 +639,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 false
                                 );
                             if (brep.Length > 0)
-                                oDualLoop.Add(brep[0]);
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path);
+                            }
                         }
             #endregion compair polygon index
 
@@ -625,6 +655,8 @@ namespace Pavillion2015.Gene_UpdatedCode
         // dual loop not directly connected to plates
         private void half_dualLoop_type_2_new(int edgeIndex, int triangleIndex, int neighbourTriIndex)
         {
+            GH_Path path = new GH_Path(triangleIndex);
+
             Edge edge = iSpringMesh.Edges[edgeIndex];
 
             // vertex point
@@ -812,24 +844,46 @@ namespace Pavillion2015.Gene_UpdatedCode
                 //oDualLoop.Add(brep1[0]);
                 Brep brepTestNormal = brep1[0];
                 BrepFace brepF = brepTestNormal.Faces[0];
+
+                // id 
+                int neighbour2TriIndex = 0;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].FirstVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].FirstAdjTriIndex;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].SecondVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].SecondAdjTriIndex;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].ThirdVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].ThirdAdjTriIndex;
+
                 if (brepF.NormalAt(0, 0).Z > 0)
                 {
                     Brep[] brepN1 = Brep.CreateFromLoft(
-                       new List<PolyCurve>() { left1, right1 },
+                       new List<Curve>() { left1, right1 },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
                        );
                     if (brep1.Length > 0)
-                        oDualLoop.Add(brepN1[0]);
+                    {
+                        oDualLoop2.Add(brepN1[0], path.AppendElement(0));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+
+                        oDualLoop2Curves.Add(left1, path.AppendElement(0));
+                        oDualLoop2Curves.Add(right1, path.AppendElement(0));
+                    }
                 }
                 else
-                    oDualLoop.Add(brep1[0]);
+                {
+                    oDualLoop2.Add(brep1[0], path.AppendElement(0));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+
+                    oDualLoop2Curves.Add(right1, path.AppendElement(0));
+                    oDualLoop2Curves.Add(left1, path.AppendElement(0));
+                }
             }
 
 
             Brep[] brep2 = Brep.CreateFromLoft(
-                       new List<PolyCurve>() { right2, left2 },
+                       new List<Curve>() { right2, left2 },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
@@ -839,19 +893,41 @@ namespace Pavillion2015.Gene_UpdatedCode
                 //oDualLoop.Add(brep2[0]);
                 Brep brepTestNormal = brep2[0];
                 BrepFace brepF = brepTestNormal.Faces[0];
+
+                // id 
+                int neighbour2TriIndex = 0;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].FirstVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].FirstAdjTriIndex;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].SecondVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].SecondAdjTriIndex;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].ThirdVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].ThirdAdjTriIndex;
+
                 if (brepF.NormalAt(0, 0).Z > 0)
                 {
                     Brep[] brepN2 = Brep.CreateFromLoft(
-                       new List<PolyCurve>() { left2, right2 },
+                       new List<Curve>() { left2, right2 },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
                        );
                     if (brep2.Length > 0)
-                        oDualLoop.Add(brepN2[0]);
+                    {
+                        oDualLoop2.Add(brepN2[0], path.AppendElement(1));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+
+                        oDualLoop2Curves.Add(left2, path.AppendElement(1));
+                        oDualLoop2Curves.Add(right2, path.AppendElement(1));
+                    }
                 }
                 else
-                    oDualLoop.Add(brep2[0]);
+                {
+                    oDualLoop2.Add(brep2[0], path.AppendElement(1));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+
+                    oDualLoop2Curves.Add(right2, path.AppendElement(1));
+                    oDualLoop2Curves.Add(left2, path.AppendElement(1));
+                }
             }
 
 

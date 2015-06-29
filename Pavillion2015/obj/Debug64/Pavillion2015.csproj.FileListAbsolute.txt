@@ -88,3 +88,10 @@ C:\Users\w-lan\Google Drive\Pavilion Seminar\Summer semester\Computational Desig
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\Pavillion2015_0.1.9\Pavillion2015_0.1.9\Pavillion2015\Pavillion2015\obj\Debug64\Pavillion2015.csproj.GenerateResource.Cache
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\Pavillion2015_0.1.9\Pavillion2015_0.1.9\Pavillion2015\Pavillion2015\obj\Debug64\Pavillion2015.dll
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\Pavillion2015_0.1.9\Pavillion2015_0.1.9\Pavillion2015\Pavillion2015\obj\Debug64\Pavillion2015.pdb
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\bin\Pavillion2015.dll
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\bin\Pavillion2015.pdb
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.csprojResolveAssemblyReference.cache
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.Properties.Resources.resources
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.csproj.GenerateResource.Cache
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.dll
+C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.pdb
