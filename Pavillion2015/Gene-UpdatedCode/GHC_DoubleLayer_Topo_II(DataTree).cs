@@ -318,15 +318,15 @@ namespace Pavillion2015.Gene_UpdatedCode
 
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
                     {
-                        half_dualLoop_type_2(i, tri01, tri02);
-                        half_dualLoop_type_2(i, tri02, tri01);
+                        half_dualLoop_type_2_new(i, tri01, tri02);
+                        half_dualLoop_type_2_new(i, tri02, tri01);
                     }
                 }
                 else
                 {
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
                     {
-                        half_dualLoop_type_2(i, tri01, -1); // give it -1 if no neighbour
+                        half_dualLoop_type_2_new(i, tri01, -1); // give it -1 if no neighbour
                     }
                 }
             }
@@ -1141,6 +1141,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 distValue = ICD.Utils.Distance(v.Position, closestPt);
                 verticesValues.Add(distValue);
             }
+            /*
             // remap
             double max = verticesValues.Max();
             double min = verticesValues.Min();
@@ -1148,7 +1149,30 @@ namespace Pavillion2015.Gene_UpdatedCode
             // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
             for (int i = 0; i < verticesValues.Count; i++)
                 verticesValues[i] = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
+            */
 
+            // remap
+            //=================================== EDITED BY JULIAN =============================================
+            double max = verticesValues.Max();
+            double min = verticesValues.Min();
+
+            // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
+
+
+            // ---- remap curveVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
+                curveVerticesValues.Add(remapedValue);
+            }
+
+            // ---- remap planarVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = iPlanarOffsetScaleMin + (verticesValues[i] - min) * (iPlanarOffsetScaleMax - iPlanarOffsetScaleMin) / (max - min);
+                planarVerticesValues.Add(remapedValue);
+            }
+            //=================================== END EDITED BY JULIAN =========================================
         }
 
         private void triLoop()
@@ -1172,9 +1196,9 @@ namespace Pavillion2015.Gene_UpdatedCode
                     //=================================== EDITED BY JULIAN =============================================
 
                     // stripes
-                    createStripe(triangle.FirstVertexIndex, triangle.SecondVertexIndex, triangle.ThirdVertexIndex, path, 0);
-                    createStripe(triangle.SecondVertexIndex, triangle.ThirdVertexIndex, triangle.FirstVertexIndex, path, 1);
-                    createStripe(triangle.ThirdVertexIndex, triangle.FirstVertexIndex, triangle.SecondVertexIndex, path, 2);
+                    createStripe2(triangle.FirstVertexIndex, triangle.SecondVertexIndex, triangle.ThirdVertexIndex, path, 0);
+                    createStripe2(triangle.SecondVertexIndex, triangle.ThirdVertexIndex, triangle.FirstVertexIndex, path, 1);
+                    createStripe2(triangle.ThirdVertexIndex, triangle.FirstVertexIndex, triangle.SecondVertexIndex, path, 2);
 
                     //=================================== END EDITED BY JULIAN =========================================
                 }
