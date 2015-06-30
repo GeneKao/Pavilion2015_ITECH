@@ -318,15 +318,15 @@ namespace Pavillion2015.Gene_UpdatedCode
 
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
                     {
-                        half_dualLoop_type_2_new(i, tri01, tri02);
-                        half_dualLoop_type_2_new(i, tri02, tri01);
+                        half_dualLoop_type_2(i, tri01, tri02);
+                        half_dualLoop_type_2(i, tri02, tri01);
                     }
                 }
                 else
                 {
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
                     {
-                        half_dualLoop_type_2_new(i, tri01, -1); // give it -1 if no neighbour
+                        half_dualLoop_type_2(i, tri01, -1); // give it -1 if no neighbour
                     }
                 }
             }
@@ -1172,9 +1172,9 @@ namespace Pavillion2015.Gene_UpdatedCode
                     //=================================== EDITED BY JULIAN =============================================
 
                     // stripes
-                    createStripe2(triangle.FirstVertexIndex, triangle.SecondVertexIndex, triangle.ThirdVertexIndex, path, 0);
-                    createStripe2(triangle.SecondVertexIndex, triangle.ThirdVertexIndex, triangle.FirstVertexIndex, path, 1);
-                    createStripe2(triangle.ThirdVertexIndex, triangle.FirstVertexIndex, triangle.SecondVertexIndex, path, 2);
+                    createStripe(triangle.FirstVertexIndex, triangle.SecondVertexIndex, triangle.ThirdVertexIndex, path, 0);
+                    createStripe(triangle.SecondVertexIndex, triangle.ThirdVertexIndex, triangle.FirstVertexIndex, path, 1);
+                    createStripe(triangle.ThirdVertexIndex, triangle.FirstVertexIndex, triangle.SecondVertexIndex, path, 2);
 
                     //=================================== END EDITED BY JULIAN =========================================
                 }
@@ -1299,7 +1299,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 oClosedPanel.Add(
                     Brep.CreateFromLoft(
-                       new List<Curve>() { new LineCurve(AB, A), new LineCurve(AC, A) },
+                       new List<Curve>() {  new LineCurve(AC, A), new LineCurve(AB, A) },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
