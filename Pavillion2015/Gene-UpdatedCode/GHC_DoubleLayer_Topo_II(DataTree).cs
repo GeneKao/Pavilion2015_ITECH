@@ -1141,6 +1141,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 distValue = ICD.Utils.Distance(v.Position, closestPt);
                 verticesValues.Add(distValue);
             }
+            /*
             // remap
             double max = verticesValues.Max();
             double min = verticesValues.Min();
@@ -1148,7 +1149,30 @@ namespace Pavillion2015.Gene_UpdatedCode
             // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
             for (int i = 0; i < verticesValues.Count; i++)
                 verticesValues[i] = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
+            */
 
+            // remap
+            //=================================== EDITED BY JULIAN =============================================
+            double max = verticesValues.Max();
+            double min = verticesValues.Min();
+
+            // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
+
+
+            // ---- remap curveVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
+                curveVerticesValues.Add(remapedValue);
+            }
+
+            // ---- remap planarVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = iPlanarOffsetScaleMin + (verticesValues[i] - min) * (iPlanarOffsetScaleMax - iPlanarOffsetScaleMin) / (max - min);
+                planarVerticesValues.Add(remapedValue);
+            }
+            //=================================== END EDITED BY JULIAN =========================================
         }
 
         private void triLoop()
