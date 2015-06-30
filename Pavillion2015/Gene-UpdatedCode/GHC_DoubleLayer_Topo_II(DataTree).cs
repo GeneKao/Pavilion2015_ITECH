@@ -32,7 +32,6 @@ namespace Pavillion2015.Gene_UpdatedCode
         //=================================== EDITED BY JULIAN =========================================
         double iPlanarOffsetScaleMin = double.NaN;
         double iPlanarOffsetScaleMax = double.NaN;
-
         double CurvePointiness = double.NaN;
         //=================================== END EDITED BY JULIAN =====================================
 
@@ -49,7 +48,10 @@ namespace Pavillion2015.Gene_UpdatedCode
         DataTree<Curve> oDualLoop1Curves = null;
         DataTree<Curve> oDualLoop2Curves = null;
         DataTree<Brep> oClosedPanel = null;
-
+        //=================================== EDITED BY JULIAN =========================================
+        // Contains Control Curve for TriLoop Planar Parts at Top and Bottom 
+        DataTree<Curve> oTriLoopPlanCrv = null;
+        //=================================== END EDITED BY JULIAN =====================================
 
         // internal usage
         List<Vector3d> vertexNormals;
@@ -66,16 +68,10 @@ namespace Pavillion2015.Gene_UpdatedCode
         //=================================== EDITED BY JULIAN =========================================
         // General Distance Relation to Attractor(s) ( before remaping to Min/Max - Range )
         List<double> verticesValues = null;
-
         // relative offset factors for individual opnening sizes (remaped verticesValues to iTangentScaleMin - iTangentScaleMax - range)
         List<double> curveVerticesValues = null;
-
         // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
         List<double> planarVerticesValues = null;
-
-        // opens or closes openings (Plate "Type 2")
-        //List<bool> openClose = null;
-
         //=================================== END EDITED BY JULIAN =====================================
 
         double documentTolerance = DocumentTolerance();
@@ -93,7 +89,6 @@ namespace Pavillion2015.Gene_UpdatedCode
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             //=================================== EDITED BY JULIAN =========================================
-
             pManager.AddGenericParameter("Spring Mesh", "Spring Mesh", "Spring Mesh", GH_ParamAccess.item);
             pManager.AddCurveParameter("PolyLine", "PolyLine", "PolyLine from Plate", GH_ParamAccess.list);
             pManager.AddNumberParameter("Thickness", "Thickness", "Thickness of Component", GH_ParamAccess.list);
@@ -105,11 +100,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddNumberParameter("Curve Pointiness", "Pointiness", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
             pManager.AddNumberParameter("PlanarOffset Min", "PlanarOffset Min", "Controlls minimal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("PlanarOffset Max", "PlanarOffset Max", "Controlls maximal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.8);
-            //pManager.AddBooleanParameter("Open/Close", "O/C", "Open or close an opening", GH_ParamAccess.list);
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list);
-
             //=================================== END EDITED BY JULIAN =====================================
-
             pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
             pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
 
@@ -130,6 +122,12 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddGenericParameter("DualLoop1Curves", "DualLoop1Curves", "DualLoop1Curves", GH_ParamAccess.tree);         // 9
             pManager.AddGenericParameter("DualLoop2Curves", "DualLoop2Curves", "DualLoop2Curves", GH_ParamAccess.tree);         // 10
             pManager.AddGenericParameter("ClosedPanel", "ClosedPanel", "ClosedPanel", GH_ParamAccess.tree);         // 11
+
+            //=================================== EDITED BY JULIAN =========================================
+            pManager.AddCurveParameter("Planar Parts of TriLoop", "TriLoopPlanarParts", "Planar Curves for Planar Parts of TriLoops", GH_ParamAccess.tree);       //12
+            //=================================== END EDITED BY JULIAN =====================================
+
+
         }
 
 
@@ -159,6 +157,10 @@ namespace Pavillion2015.Gene_UpdatedCode
             oDualLoop2Curves = new DataTree<Curve>();
             oClosedPanel = new DataTree<Brep>();
 
+            //=================================== EDITED BY JULIAN =========================================
+            oTriLoopPlanCrv = new DataTree<Curve>();
+            //=================================== END EDITED BY JULIAN =====================================
+
             // internal use data
             topCenterPts = new List<Point3d>();
             bottomCenterPts = new List<Point3d>();
@@ -170,12 +172,9 @@ namespace Pavillion2015.Gene_UpdatedCode
             indexSortPolygon = new List<int[]>();   // array is reference type in csharp
 
             //=================================== EDITED BY JULIAN =========================================
-
             verticesValues = new List<double>();
             curveVerticesValues = new List<double>();
             planarVerticesValues = new List<double>();
-            //openClose = new List<bool>();
-
             //=================================== END EDITED BY JULIAN =====================================
         }
 
@@ -196,12 +195,9 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetData<double>("Panel Effect Area", ref iClosePanelDist);
 
             //=================================== EDITED BY JULIAN =========================================
-
             DA.GetData<double>("PlanarOffset Min", ref iPlanarOffsetScaleMin);
             DA.GetData<double>("PlanarOffset Max", ref iPlanarOffsetScaleMax);
-            //DA.GetDataList<bool>("Open/Close", openClose);
             DA.GetData<double>("Curve Pointiness", ref CurvePointiness);
-
             //=================================== END EDITED BY JULIAN =====================================
 
             //------------------------------------------------------------
@@ -232,6 +228,10 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.SetDataTree(9, oDualLoop1Curves);
             DA.SetDataTree(10, oDualLoop2Curves);
             DA.SetDataTree(11, oClosedPanel);
+
+            //=================================== EDITED BY JULIAN =========================================
+            DA.SetDataTree(12, oTriLoopPlanCrv);
+            //=================================== END EDITED BY JULIAN =====================================
             // -----------------------------------------------------------
         }
 
@@ -332,7 +332,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
         }
 
-        // dual loop directly connected to plates
+        // dual loop directly connected to plates ---- NOT IN USE ----
         private void half_dualLoop_type_1(int edgeIndex)
         {
             Edge edge = iSpringMesh.Edges[edgeIndex];
@@ -466,7 +466,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         //=================================== EDITED BY JULIAN =============================================
 
-        // dual loop directly connected to plates
+        // dual loop directly connected to plates 
         private void half_dualLoop_type_1_new(int edgeIndex)
         {
             Edge edge = iSpringMesh.Edges[edgeIndex];
@@ -937,7 +937,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         // dual loop not directly connected to plates
 
-        // dual loop not directly connected to plates
+        // dual loop not directly connected to plates ---- NOT IN USE ----
         private void half_dualLoop_type_2(int edgeIndex, int triangleIndex, int neighbourTriIndex)
         {
             GH_Path path = new GH_Path(triangleIndex);
@@ -1205,6 +1205,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
         }
 
+        // ---- NOT IN USE ----
         private void createStripe(int firstVertexIndex, int secondVertexIndex, int thirdVertexIndex, GH_Path path, int item)
         {
             // first vertex in the stripe direction
@@ -1379,16 +1380,12 @@ namespace Pavillion2015.Gene_UpdatedCode
             Vector3d v_AB = A - B;
             v_ab.Unitize();
             v_AB.Unitize();
-            //v_ab *= planarOffset;
-            //v_AB *= planarOffset;
 
             // Offset : Centre of Edge AC
             Vector3d v_ac = a - c;
             Vector3d v_AC = A - C;
             v_ac.Unitize();
             v_AC.Unitize();
-            //v_ac *= planarOffset;
-            //v_AC *= planarOffset;
 
             // not used
             #region Correct Offset
@@ -1498,11 +1495,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                 PolyCurve polyCurve2 = new PolyCurve();
                 polyCurve2.Append(profileCurve2);
 
+                // Planar Part Curves
                 Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
                 Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
 
-                Brep[] planarBrepBottom = Brep.CreatePlanarBreps(planarCurveBottom);
-                Brep[] planarBrepTop = Brep.CreatePlanarBreps(planarCurveTop);
+                // Add Planar Crv
+                oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
+                oTriLoopPlanCrv.Add(planarCurveTop, path.AppendElement(item));
 
                 // Add Bended Brep
                 oTriLoop.Add(
@@ -1513,10 +1512,6 @@ namespace Pavillion2015.Gene_UpdatedCode
                        false
                        )[0], path.AppendElement(item)
                    );
-
-                // Add Planar Breps
-                //oTriLoop.Add( planarBrepBottom[0], path.AppendElement(item) );
-                //oTriLoop.Add( planarBrepTop[0], path.AppendElement(item) );
                 #endregion Seperate Planar from Curved Method
 
             }
@@ -1531,6 +1526,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                     new List<Curve>() { new LineCurve(c, oac), profileCurve2, new LineCurve(oAC, C) },
                     documentTolerance,
                     true)[0];
+                
+                // Planar Part Curves
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
+                // Add Planar Crvs
+                oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
+                oTriLoopPlanCrv.Add(planarCurveTop, path.AppendElement(item));
 
                 Brep brep = Brep.CreateFromLoft(
                        new List<Curve>() { profileCurve1, profileCurve2 },
