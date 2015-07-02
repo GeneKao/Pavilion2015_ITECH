@@ -315,8 +315,142 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
         }
 
-        // dual loop directly connected to plates 
+        // dual loop directly connected to plates ---- NOT IN USE ----
         private void half_dualLoop_type_1(int edgeIndex)
+        {
+            Edge edge = iSpringMesh.Edges[edgeIndex];
+
+            int rightTriIndex = edge.FirstTriangleIndex;
+            int leftTriIndex = edge.SecondTriangleIndex;
+
+            // vertex point
+            int vertex1 = edge.FirstVertexIndex;
+            int vertex2 = edge.SecondVertexIndex;
+
+            int vertex = vertex1;
+            int occupyiedVertex = vertex2;
+
+            if (iVertexStatus[vertex1] == false && iVertexStatus[vertex2] == true) { vertex = vertex1; occupyiedVertex = vertex2; }
+            else if (iVertexStatus[vertex2] == false && iVertexStatus[vertex1] == true) { vertex = vertex2; occupyiedVertex = vertex1; }
+            else { oInfo += "got it..."; }
+
+            Point3d vertexPt = iSpringMesh.Vertices[vertex].Position;
+
+            // layer up
+            Point3d rightUp01 = topCenterPts[rightTriIndex];
+            Point3d leftUp01 = topCenterPts[leftTriIndex];
+
+            Point3d up03 = topCps[vertex]; //reference point not for construct surfaces
+
+            double scaler = verticesValues[vertex];
+
+            Point3d rightUp02 = (1 - scaler) * rightUp01 + (scaler) * up03;
+            Point3d leftUp02 = (1 - scaler) * leftUp01 + (scaler) * up03;
+
+            // layer down
+            Point3d rightDown01 = bottomCenterPts[rightTriIndex];
+            Point3d leftDown01 = bottomCenterPts[leftTriIndex];
+
+            Point3d down03 = bottomCps[vertex]; //reference point not for construct surfaces
+
+            Point3d rightDown02 = (1 - scaler) * rightDown01 + (scaler) * down03;
+            Point3d leftDown02 = (1 - scaler) * leftDown01 + (scaler) * down03;
+
+            Curve right = Curve.CreateControlPointCurve(
+                new List<Point3d>() { rightUp01, rightUp02, vertexPt, rightDown02, rightDown01 });
+
+            Curve left = Curve.CreateControlPointCurve(
+                new List<Point3d>() { leftUp01, leftUp02, vertexPt, leftDown02, leftDown01 });
+
+            // dataTree 
+            int plateID = iPolyLineID[occupyiedVertex];
+
+            GH_Path path = new GH_Path(plateID);
+
+            // compare their polygon index to sort the lofting sequence 
+            int[] rightIndex = indexSortPolygon[rightTriIndex];
+            int[] leftIndex = indexSortPolygon[leftTriIndex];
+
+            for (int r = 0; r < 3; r++)
+                for (int l = 0; l < 3; l++)
+                    if (rightIndex[r] == leftIndex[l] && rightIndex[r] != -1 && leftIndex[l] != -1) // check to use right polygon
+                        if ((rightIndex[r + 3] == 0 && leftIndex[l + 3] != 1) ||
+                            (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] < leftIndex[l + 3]))
+                        {
+                            Brep[] brep = Brep.CreateFromLoft(
+                                new List<Curve>() { right, left },
+                                Point3d.Unset, Point3d.Unset,
+                                LoftType.Normal,
+                                false
+                                );
+                            if (brep.Length > 0)
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path);
+                            }
+                        }
+                        else if ((rightIndex[r + 3] == 0 && leftIndex[l + 3] != 1) ||
+                                 (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] >= leftIndex[l + 3]))
+                        {
+                            Brep[] brep = Brep.CreateFromLoft(
+                                new List<Curve>() { left, right },
+                                Point3d.Unset, Point3d.Unset,
+                                LoftType.Normal,
+                                false
+                                );
+                            if (brep.Length > 0)
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path);
+                            }
+                        }
+                        else if (rightIndex[r + 3] >= leftIndex[l + 3])
+                        {
+                            Brep[] brep = Brep.CreateFromLoft(
+                                new List<Curve>() { right, left },
+                                Point3d.Unset, Point3d.Unset,
+                                LoftType.Normal,
+                                false
+                                );
+                            if (brep.Length > 0)
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path);
+                            }
+                        }
+                        else if (rightIndex[r + 3] < leftIndex[l + 3])
+                        {
+                            Brep[] brep = Brep.CreateFromLoft(
+                                new List<Curve>() { left, right },
+                                Point3d.Unset, Point3d.Unset,
+                                LoftType.Normal,
+                                false
+                                );
+                            if (brep.Length > 0)
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path);
+                            }
+                        }
+
+        }
+
+        //=================================== EDITED BY JULIAN =============================================
+
+        // dual loop directly connected to plates 
+        private void half_dualLoop_type_1_new(int edgeIndex)
         {
             Edge edge = iSpringMesh.Edges[edgeIndex];
 
@@ -502,7 +636,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         }
 
         // dual loop not directly connected to plates
-        private void half_dualLoop_type_2(int edgeIndex, int triangleIndex, int neighbourTriIndex)
+        private void half_dualLoop_type_2_new(int edgeIndex, int triangleIndex, int neighbourTriIndex)
         {
             GH_Path path = new GH_Path(triangleIndex);
 
@@ -782,7 +916,159 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         }
 
+        //=================================== END EDITED BY JULIAN =========================================
 
+        // dual loop not directly connected to plates
+
+        // dual loop not directly connected to plates ---- NOT IN USE ----
+        private void half_dualLoop_type_2(int edgeIndex, int triangleIndex, int neighbourTriIndex)
+        {
+            GH_Path path = new GH_Path(triangleIndex);
+
+            Edge edge = iSpringMesh.Edges[edgeIndex];
+
+            // vertex point
+            int vertex1 = edge.FirstVertexIndex;
+            int vertex2 = edge.SecondVertexIndex;
+
+            Point3d vertexPt1 = iSpringMesh.Vertices[vertex1].Position;
+            Point3d vertexPt2 = iSpringMesh.Vertices[vertex2].Position;
+
+            double scaler1 = verticesValues[vertex1];
+            double scaler2 = verticesValues[vertex2];
+
+            Point3d vertexPtUp1 = topCps[vertex1];
+            Point3d vertexPtUp2 = topCps[vertex2];
+            Point3d vertexPtUpM = 0.5 * (vertexPtUp1 + vertexPtUp2);
+            Point3d ctPtUp1 = (scaler1) * vertexPtUp1 + (1 - scaler1) * vertexPtUpM;
+            Point3d ctPtUp2 = (scaler2) * vertexPtUp2 + (1 - scaler2) * vertexPtUpM;
+
+            Point3d vertexPtDown1 = bottomCps[vertex1];
+            Point3d vertexPtDown2 = bottomCps[vertex2];
+            Point3d vertexPtDownM = 0.5 * (vertexPtDown1 + vertexPtDown2);
+            Point3d ctPtDown1 = (scaler1) * vertexPtDown1 + (1 - scaler1) * vertexPtDownM;
+            Point3d ctPtDown2 = (scaler2) * vertexPtDown2 + (1 - scaler2) * vertexPtDownM;
+
+            Point3d upTPI = topCenterPts[triangleIndex];
+            Point3d downTPI = bottomCenterPts[triangleIndex];
+            Point3d ctUpTPI1 = (scaler1) * vertexPtUp1 + (1 - scaler1) * upTPI;
+            Point3d ctDownTPI1 = (scaler1) * vertexPtDown1 + (1 - scaler1) * downTPI;
+            Point3d ctUpTPI2 = (scaler2) * vertexPtUp2 + (1 - scaler2) * upTPI;
+            Point3d ctDownTPI2 = (scaler2) * vertexPtDown2 + (1 - scaler2) * downTPI;
+
+            Curve right1 = Curve.CreateControlPointCurve(
+                new List<Point3d>() { upTPI, ctUpTPI1, vertexPt1, ctDownTPI1, downTPI });
+
+            Curve left1 = Curve.CreateControlPointCurve(
+                new List<Point3d>() { vertexPtUpM, ctPtUp1, vertexPt1, ctPtDown1, vertexPtDownM });
+
+            Curve right2 = Curve.CreateControlPointCurve(
+                new List<Point3d>() { upTPI, ctUpTPI2, vertexPt2, ctDownTPI2, downTPI });
+
+            Curve left2 = Curve.CreateControlPointCurve(
+                new List<Point3d>() { vertexPtUpM, ctPtUp2, vertexPt2, ctPtDown2, vertexPtDownM });
+
+            // sorting sequence 
+
+            Brep[] brep1 = Brep.CreateFromLoft(
+                       new List<Curve>() { right1, left1 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       );
+            if (brep1.Length > 0)
+            {
+                //oDualLoop.Add(brep1[0]);
+                Brep brepTestNormal = brep1[0];
+                BrepFace brepF = brepTestNormal.Faces[0];
+
+                // id 
+                int neighbour2TriIndex = 0;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].FirstVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].FirstAdjTriIndex;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].SecondVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].SecondAdjTriIndex;
+                if (vertex2 == iSpringMesh.Triangles[triangleIndex].ThirdVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].ThirdAdjTriIndex;
+
+                if (brepF.NormalAt(0, 0).Z > 0)
+                {
+                    Brep[] brepN1 = Brep.CreateFromLoft(
+                       new List<Curve>() { left1, right1 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       );
+                    if (brep1.Length > 0)
+                    {
+                        oDualLoop2.Add(brepN1[0], path.AppendElement(0));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+
+                        oDualLoop2Curves.Add(left1, path.AppendElement(0));
+                        oDualLoop2Curves.Add(right1, path.AppendElement(0));
+                    }
+                }
+                else
+                {
+                    oDualLoop2.Add(brep1[0], path.AppendElement(0));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+
+                    oDualLoop2Curves.Add(right1, path.AppendElement(0));
+                    oDualLoop2Curves.Add(left1, path.AppendElement(0));
+                }
+            }
+
+
+            Brep[] brep2 = Brep.CreateFromLoft(
+                       new List<Curve>() { right2, left2 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       );
+            if (brep2.Length > 0)
+            {
+                //oDualLoop.Add(brep2[0]);
+                Brep brepTestNormal = brep2[0];
+                BrepFace brepF = brepTestNormal.Faces[0];
+
+                // id 
+                int neighbour2TriIndex = 0;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].FirstVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].FirstAdjTriIndex;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].SecondVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].SecondAdjTriIndex;
+                if (vertex1 == iSpringMesh.Triangles[triangleIndex].ThirdVertexIndex)
+                    neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].ThirdAdjTriIndex;
+
+                if (brepF.NormalAt(0, 0).Z > 0)
+                {
+                    Brep[] brepN2 = Brep.CreateFromLoft(
+                       new List<Curve>() { left2, right2 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       );
+                    if (brep2.Length > 0)
+                    {
+                        oDualLoop2.Add(brepN2[0], path.AppendElement(1));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+
+                        oDualLoop2Curves.Add(left2, path.AppendElement(1));
+                        oDualLoop2Curves.Add(right2, path.AppendElement(1));
+                    }
+                }
+                else
+                {
+                    oDualLoop2.Add(brep2[0], path.AppendElement(1));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+
+                    oDualLoop2Curves.Add(right2, path.AppendElement(1));
+                    oDualLoop2Curves.Add(left2, path.AppendElement(1));
+                }
+            }
+
+
+        }
 
         // calculate normal on vertices and deal with boarder condition.
         private void calculateVertexNormals()
@@ -902,8 +1188,145 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
         }
 
-        //=================================== EDITED BY JULIAN =============================================
+        // ---- NOT IN USE ----
         private void createStripe(int firstVertexIndex, int secondVertexIndex, int thirdVertexIndex, GH_Path path, int item)
+        {
+            // first vertex in the stripe direction
+            Point3d a = bottomCps[firstVertexIndex];
+            Point3d A = topCps[firstVertexIndex];
+
+            Point3d aA = 0.5 * (a + A);
+
+            Point3d b = bottomCps[secondVertexIndex];
+            Point3d B = topCps[secondVertexIndex];
+
+            Point3d c = bottomCps[thirdVertexIndex];
+            Point3d C = topCps[thirdVertexIndex];
+
+            Point3d ab = 0.5 * (a + b);
+            Point3d AB = 0.5 * (A + B);
+
+            Point3d ac = 0.5 * (a + c);
+            Point3d AC = 0.5 * (A + C);
+
+            Point3d m = (ab + ac + 0.5 * (b + c)) / 3;
+            Point3d M = (AB + AC + 0.5 * (B + C)) / 3;
+
+            double scaler = verticesValues[firstVertexIndex];
+
+            Point3d AAB = scaler * A + (1.0 - scaler) * AB;
+            Point3d aab = scaler * a + (1.0 - scaler) * ab;
+
+            Point3d AAC = scaler * A + (1.0 - scaler) * AC;
+            Point3d aac = scaler * a + (1.0 - scaler) * ac;
+
+            Curve profileCurve1 = Curve.CreateControlPointCurve(new List<Point3d>() { ab, aab, aA, AAB, AB });
+            Curve profileCurve2 = Curve.CreateControlPointCurve(new List<Point3d>() { ac, aac, aA, AAC, AC });
+
+            oTriLoopCurves.Add(profileCurve1, path.AppendElement(item));
+            oTriLoopCurves.Add(profileCurve2, path.AppendElement(item));
+
+            if (iPolySrf)
+            {
+                PolyCurve polyCurve1 = new PolyCurve();
+                polyCurve1.Append(new LineCurve(m, ab));
+                polyCurve1.Append(profileCurve1);
+                polyCurve1.Append(new LineCurve(AB, M));
+
+                PolyCurve polyCurve2 = new PolyCurve();
+                polyCurve2.Append(new LineCurve(m, ac));
+                polyCurve2.Append(profileCurve2);
+                polyCurve2.Append(new LineCurve(AC, M));
+
+                oTriLoop.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { polyCurve1, polyCurve2 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                   );
+            }
+            else
+            {
+                profileCurve1 = Curve.JoinCurves(
+                    new List<Curve>() { new LineCurve(b, ab), profileCurve1, new LineCurve(AB, B) },
+                    documentTolerance,
+                    true)[0];
+
+                profileCurve2 = Curve.JoinCurves(
+                    new List<Curve>() { new LineCurve(c, ac), profileCurve2, new LineCurve(AC, C) },
+                    documentTolerance,
+                    true)[0];
+
+                Brep brep = Brep.CreateFromLoft(
+                       new List<Curve>() { profileCurve1, profileCurve2 },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0];
+
+                // =============================================
+                // Trim the brep using planes
+                // =============================================
+
+                double offsetAmount = 0.02;
+                Vector3d normal;
+                Brep[] breps;
+
+                normal = Vector3d.CrossProduct(B - A, C - A);
+
+                Point3d A_ = A + offsetAmount * normal;
+
+                breps = brep.Trim(new Plane(A_, AB, M), documentTolerance);
+                if (breps.Length > 0) brep = breps[0];
+                else { oTriLoop.Add(brep, path.AppendElement(item)); return; }
+
+                breps = brep.Trim(new Plane(A_, M, AC), documentTolerance);
+                if (breps.Length > 0) brep = breps[0];
+                else { oTriLoop.Add(brep, path.AppendElement(item)); return; }
+
+                normal = Vector3d.CrossProduct(b - a, c - a);
+
+                Point3d a_ = a - offsetAmount * normal;
+
+                breps = brep.Trim(new Plane(a_, m, ab), documentTolerance);
+                if (breps.Length > 0) brep = breps[0];
+                else { oTriLoop.Add(brep, path.AppendElement(item)); return; }
+
+                breps = brep.Trim(new Plane(a_, ac, m), documentTolerance);
+                if (breps.Length > 0) brep = breps[0];
+                else { oTriLoop.Add(brep, path.AppendElement(item)); return; }
+
+                oTriLoop.Add(brep, path.AppendElement(item));
+            }
+
+            // close panel
+            Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, iSpringMesh.Vertices[firstVertexIndex].Position);
+            if (ICD.Utils.Distance(closeVertice, iSpringMesh.Vertices[firstVertexIndex].Position) < iClosePanelDist)
+            {
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(AC, A), new LineCurve(AB, A) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(ab, a), new LineCurve(ac, a) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+            }
+
+        }
+
+        //=================================== EDITED BY JULIAN =============================================
+        private void createStripe2(int firstVertexIndex, int secondVertexIndex, int thirdVertexIndex, GH_Path path, int item)
         {
             // first vertex in the stripe direction
             Point3d a = bottomCps[firstVertexIndex];
