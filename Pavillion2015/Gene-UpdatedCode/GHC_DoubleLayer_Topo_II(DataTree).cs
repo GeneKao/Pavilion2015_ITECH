@@ -1496,8 +1496,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                 polyCurve2.Append(profileCurve2);
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
 
                 // Add Planar Crv
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
@@ -1529,8 +1529,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                     true)[0];
                 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
                 // Add Planar Crvs
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
                 oTriLoopPlanCrv.Add(planarCurveTop, path.AppendElement(item));
