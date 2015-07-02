@@ -1292,7 +1292,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 // Trim the brep using planes
                 // =============================================
 
-                double offsetAmount = 0.2;
+                double offsetAmount = 0.02;
                 Vector3d normal;
                 Brep[] breps;
 
