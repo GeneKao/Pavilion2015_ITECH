@@ -1614,8 +1614,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
             List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, item);
 
-            //oDebugList = oDebugList.Concat(EffectorHoleTop).Concat(EffectorHoleBottom).ToList();
-
             foreach (Point3d pt in EffectorHoleTop)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(1));
 
@@ -1641,7 +1639,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             { v_am.Rotate(angleRadians, normal); }
 
             // for 3rd Stripe
-            else if (idx == 1)
+            else if (idx == 2)
             { v_am.Rotate((2 * angleRadians), normal); }
 
             Point3d pt1 = m + (v_am * distance1);
