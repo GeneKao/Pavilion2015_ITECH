@@ -327,8 +327,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             int vertex = vertex1;
             int occupyiedVertex = vertex2;
 
-            if (iVertexStatus[vertex1] == false && iVertexStatus[vertex2] == true) { vertex = vertex1; }
-            else if (iVertexStatus[vertex2] == false && iVertexStatus[vertex1] == true) { vertex = vertex2; }
+            if (iVertexStatus[vertex1] == false && iVertexStatus[vertex2] == true) { vertex = vertex1; occupyiedVertex = vertex2; }
+            else if (iVertexStatus[vertex2] == false && iVertexStatus[vertex1] == true) { vertex = vertex2; occupyiedVertex = vertex1; }
             else { oInfo += "got it..."; }
 
 
