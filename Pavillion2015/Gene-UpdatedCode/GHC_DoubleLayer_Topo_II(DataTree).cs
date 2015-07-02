@@ -1373,8 +1373,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
 
             // Centre of Mesh Face
-            Point3d m = 0.33333 * (ab + ac + 0.5 * (b + c));
-            Point3d M = 0.33333 * (AB + AC + 0.5 * (B + C));
+            Point3d m = (ab + ac + 0.5 * (b + c)) / 3 ;
+            Point3d M = (AB + AC + 0.5 * (B + C)) / 3 ;
 
 
             // perform planar Offset
