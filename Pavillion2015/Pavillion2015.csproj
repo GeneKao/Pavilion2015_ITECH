@@ -65,7 +65,7 @@
     <Compile Include="Gene-UpdatedCode\GHC_DoubleLayerTopology.cs" />
     <Compile Include="Gene-UpdatedCode\GHC_DoubleLayer_Topo_I.cs" />
     <Compile Include="Gene-UpdatedCode\GHC_DoubleLayer_Topo_II%28DataTree%29.cs" />
-    <Compile Include="Gene-UpdatedCode\GHC_DoubleLayer_Topo_II.cs" />
+    <None Include="Gene-UpdatedCode\GHC_DoubleLayer_Topo_II.cs" />
     <Compile Include="Gene-UpdatedCode\GHC_DualLoopDoubleLayer.cs" />
     <Compile Include="Gene-UpdatedCode\GHC_PlanarPlateExperimental.cs" />
     <Compile Include="Gene-UpdatedCode\GHC_RhinoMeshToSpringMesh.cs" />
@@ -129,7 +129,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\Gene Kao\AppData\Roaming\Grasshopper\Libraries\Gene\$(ProjectName).gha"
+    <PostBuildEvent>Copy "$(TargetPath)" "C:\Users\w-lan\AppData\Roaming\Grasshopper\Libraries\$(ProjectName).gha"
 Erase "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
