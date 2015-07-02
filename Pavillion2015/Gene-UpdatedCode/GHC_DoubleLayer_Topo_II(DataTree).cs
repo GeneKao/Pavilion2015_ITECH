@@ -28,12 +28,9 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<Point3d> iAttractors = null;
         List<Point3d> iClosedPanelPts = null;
         double iClosePanelDist = 0.001;
-
-        //=================================== EDITED BY JULIAN =========================================
         double iPlanarOffsetScaleMin = double.NaN;
         double iPlanarOffsetScaleMax = double.NaN;
         double CurvePointiness = double.NaN;
-        //=================================== END EDITED BY JULIAN =====================================
 
         // output
         string oInfo = string.Empty;
