@@ -1496,8 +1496,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                 polyCurve2.Append(profileCurve2);
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
 
                 // Add Planar Crv
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
@@ -1516,6 +1516,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             }
             else
+            #region single surface
             {
                 profileCurve1 = Curve.JoinCurves(
                     new List<Curve>() { new LineCurve(b, oab), profileCurve1, new LineCurve(oAB, B) },
@@ -1528,8 +1529,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                     true)[0];
                 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
                 // Add Planar Crvs
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
                 oTriLoopPlanCrv.Add(planarCurveTop, path.AppendElement(item));
@@ -1575,6 +1576,34 @@ namespace Pavillion2015.Gene_UpdatedCode
 
                 oTriLoop.Add(brep, path.AppendElement(item));
             }
+            #endregion single surface
+
+            #region close stripe
+
+            // close panel
+            Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, iSpringMesh.Vertices[firstVertexIndex].Position);
+            if (ICD.Utils.Distance(closeVertice, iSpringMesh.Vertices[firstVertexIndex].Position) < iClosePanelDist)
+            {
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(oAB, A), new LineCurve(oAC, A) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(oab, a), new LineCurve(oac, a) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+            }
+
+            #endregion close stripe
+
 
             // do EffectorHoles
             List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
