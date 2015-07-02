@@ -3,5 +3,5 @@
 *.pdb
 *.sln
 *.doc
-./*.csproj
-./*.user
+*.csproj
+*.user
