@@ -1516,6 +1516,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             }
             else
+            #region single surface
             {
                 profileCurve1 = Curve.JoinCurves(
                     new List<Curve>() { new LineCurve(b, oab), profileCurve1, new LineCurve(oAB, B) },
@@ -1575,6 +1576,34 @@ namespace Pavillion2015.Gene_UpdatedCode
 
                 oTriLoop.Add(brep, path.AppendElement(item));
             }
+            #endregion single surface
+
+            #region close stripe
+
+            // close panel
+            Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, iSpringMesh.Vertices[firstVertexIndex].Position);
+            if (ICD.Utils.Distance(closeVertice, iSpringMesh.Vertices[firstVertexIndex].Position) < iClosePanelDist)
+            {
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(oAB, A), new LineCurve(oAC, A) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+                oClosedPanel.Add(
+                    Brep.CreateFromLoft(
+                       new List<Curve>() { new LineCurve(oab, a), new LineCurve(oac, a) },
+                       Point3d.Unset, Point3d.Unset,
+                       LoftType.Normal,
+                       false
+                       )[0], path.AppendElement(item)
+                    );
+            }
+
+            #endregion close stripe
+
 
             // do EffectorHoles
             List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
