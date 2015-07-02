@@ -51,6 +51,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         //=================================== EDITED BY JULIAN =========================================
         // Contains Control Curve for TriLoop Planar Parts at Top and Bottom 
         DataTree<Curve> oTriLoopPlanCrv = null;
+        DataTree<Point3d> oTriLoopEffectorHoles = null;
         //=================================== END EDITED BY JULIAN =====================================
 
         // internal usage
@@ -125,6 +126,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             //=================================== EDITED BY JULIAN =========================================
             pManager.AddCurveParameter("Planar Parts of TriLoop", "TriLoopPlanarParts", "Planar Curves for Planar Parts of TriLoops", GH_ParamAccess.tree);       //12
+            pManager.AddPointParameter("Holes for Effector", "EffectorHolePts", "Points for EffectorHoles", GH_ParamAccess.tree);       //13
             //=================================== END EDITED BY JULIAN =====================================
 
 
@@ -159,6 +161,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             //=================================== EDITED BY JULIAN =========================================
             oTriLoopPlanCrv = new DataTree<Curve>();
+            oTriLoopEffectorHoles = new DataTree<Point3d>();
+
             //=================================== END EDITED BY JULIAN =====================================
 
             // internal use data
@@ -231,6 +235,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             //=================================== EDITED BY JULIAN =========================================
             DA.SetDataTree(12, oTriLoopPlanCrv);
+            DA.SetDataTree(13, oTriLoopEffectorHoles);
             //=================================== END EDITED BY JULIAN =====================================
             // -----------------------------------------------------------
         }
@@ -1609,7 +1614,13 @@ namespace Pavillion2015.Gene_UpdatedCode
             List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
             List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, item);
 
-            oDebugList = oDebugList.Concat(EffectorHoleTop).Concat(EffectorHoleBottom).ToList();
+            //oDebugList = oDebugList.Concat(EffectorHoleTop).Concat(EffectorHoleBottom).ToList();
+
+            foreach (Point3d pt in EffectorHoleTop)
+                oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(1));
+
+            foreach (Point3d pt in EffectorHoleBottom)
+                oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(0));
         }
 
         private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, int idx)
