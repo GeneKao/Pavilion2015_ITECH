@@ -1231,8 +1231,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d ac = 0.5 * (a + c);
             Point3d AC = 0.5 * (A + C);
 
-            Point3d m = 0.33333 * (ab + ac + 0.5 * (b + c));
-            Point3d M = 0.33333 * (AB + AC + 0.5 * (B + C));
+            Point3d m = (ab + ac + 0.5 * (b + c)) / 3;
+            Point3d M = (AB + AC + 0.5 * (B + C)) / 3;
 
             double scaler = verticesValues[firstVertexIndex];
 
