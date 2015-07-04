@@ -111,7 +111,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddGenericParameter("DualLoop1Curves", "DualLoop1Curves", "DualLoop1Curves", GH_ParamAccess.tree);         // 9
             pManager.AddGenericParameter("DualLoop2Curves", "DualLoop2Curves", "DualLoop2Curves", GH_ParamAccess.tree);         // 10
             pManager.AddGenericParameter("ClosedPanel", "ClosedPanel", "ClosedPanel", GH_ParamAccess.tree);         // 11
-            pManager.AddCurveParameter("Planar Parts of TriLoop", "TriLoopPlanarParts", "Planar Curves for Planar Parts of TriLoops", GH_ParamAccess.tree);       //12
+            pManager.AddGenericParameter("Planar Parts of TriLoop", "TriLoopPlanarParts", "Planar Curves for Planar Parts of TriLoops", GH_ParamAccess.tree);       //12
             pManager.AddPointParameter("Holes for Effector", "EffectorHolePts", "Points for EffectorHoles", GH_ParamAccess.tree);       //13
 
         }
@@ -1008,7 +1008,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             if (iPolySrf)
             {
-                //not used method
+                //not used method : if triloop need to be polySurface. 
                 #region Genes Method
                 /*
                 PolyCurve polyCurve1 = new PolyCurve();
@@ -1046,7 +1046,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 polyCurve2.Append(profileCurve2);
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { ac, oac, oab, ab, m }, 1);
                 Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
 
                 // Add Planar Crv
@@ -1079,7 +1079,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                     true)[0];
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ab, oab, oac, ac }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { ac, oac, oab, ab, m }, 1);
                 Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
                 // Add Planar Crvs
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
@@ -1136,7 +1136,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 oClosedPanel.Add(
                     Brep.CreateFromLoft(
-                       new List<Curve>() { new LineCurve(oAB, A), new LineCurve(oAC, A) },
+                       new List<Curve>() { new LineCurve(A, oAB), new LineCurve(A, oAC) },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
