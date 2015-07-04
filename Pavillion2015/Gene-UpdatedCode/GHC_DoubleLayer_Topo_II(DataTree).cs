@@ -700,7 +700,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 if (vertex2 == iSpringMesh.Triangles[triangleIndex].ThirdVertexIndex)
                     neighbour2TriIndex = iSpringMesh.Triangles[triangleIndex].ThirdAdjTriIndex;
 
-                if (brepF.NormalAt(0, 0).Z > 0)
+                if (brepF.NormalAt(0, 0).Z > 0)  // conditional flipping surface, according face normal. special case for our pavilion mesh
                 {
                     Brep[] brepN1 = Brep.CreateFromLoft(
                        new List<Curve>() { left1, right1 },
@@ -1046,8 +1046,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                 polyCurve2.Append(profileCurve2);
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { ac, oac, oab, ab, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ac, oac, oab, ab, m }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
 
                 // Add Planar Crv
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
@@ -1079,8 +1079,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                     true)[0];
 
                 // Planar Part Curves
-                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { ac, oac, oab, ab, m }, 1);
-                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC }, 1);
+                Curve planarCurveBottom = Curve.CreateControlPointCurve(new List<Point3d>() { m, ac, oac, oab, ab, m }, 1);
+                Curve planarCurveTop = Curve.CreateControlPointCurve(new List<Point3d>() { M, AB, oAB, oAC, AC, M }, 1);
                 // Add Planar Crvs
                 oTriLoopPlanCrv.Add(planarCurveBottom, path.AppendElement(item));
                 oTriLoopPlanCrv.Add(planarCurveTop, path.AppendElement(item));
