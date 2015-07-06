@@ -1156,8 +1156,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
 
             // do EffectorHoles
-            List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
-            List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, item);
+            List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, oAB, oAC, item);
+            List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, oab, oac, item);
 
             foreach (Point3d pt in EffectorHoleTop)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(1));
@@ -1167,7 +1167,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         }
 
 
-        private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, int idx)
+        private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, Point3d oab, Point3d oac, int idx)
         {
             double distance1 = 0.075;
             double distance2 = 0.145;
@@ -1175,6 +1175,15 @@ namespace Pavillion2015.Gene_UpdatedCode
             double angleRadians = Utils.ToRadian(120);
 
             List<Point3d> effectorHoles = new List<Point3d>();
+
+            // check distance to end-of-planarity-line
+            Vector3d v_toPlanarLine = (0.5 * (oac + oab)) - m;
+            
+            if(v_toPlanarLine.Length < 0.145)
+            {
+                distance1 = 0.035;
+                distance2 = 0.075;
+            }
 
             // for 1st stipe (main stripe)
             Vector3d v_am = a - m;
