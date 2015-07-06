@@ -1182,11 +1182,19 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // for 2nd Stripe
             if (idx == 1)
-            { v_am.Rotate(angleRadians, normal); }
+            {
+                v_am = c - m;
+                v_am.Unitize();
+                v_am.Rotate(angleRadians, normal); 
+            }
 
             // for 3rd Stripe
             else if (idx == 2)
-            { v_am.Rotate((2 * angleRadians), normal); }
+            {
+                v_am = b - m;
+                v_am.Unitize();
+                v_am.Rotate((2 * angleRadians), normal); 
+            }
 
             Point3d pt1 = m + (v_am * distance1);
             Point3d pt2 = m + (v_am * distance2);
