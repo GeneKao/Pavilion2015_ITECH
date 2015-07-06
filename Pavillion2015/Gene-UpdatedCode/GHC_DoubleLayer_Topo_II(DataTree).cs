@@ -1165,8 +1165,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             foreach (Point3d pt in EffectorHoleBottom)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(0));
         }
-
-
+        
         private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, Point3d oab, Point3d oac, int idx)
         {
             double distance1 = 0.075;
