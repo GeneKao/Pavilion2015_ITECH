@@ -67,6 +67,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<double> planarVerticesValues = null;  // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
 
         double documentTolerance = DocumentTolerance();
+        int curveDegree = 2;   // here change curve degree
 
 
         public GHC_DoubleLayer_Topo_II_DataTree_()
@@ -381,22 +382,24 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Right Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve rightLoop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oRightUp01, rightUp02, rightVertexPt, rightDown02, oRightDown01 }, 2);
+                new List<Point3d>() { oRightUp01, rightUp02, rightVertexPt, rightDown02, oRightDown01 }, curveDegree);
 
             Curve rightPlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { rightUp01, oRightUp01 }, 1);
 
             Curve rightPlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oRightDown01, rightDown01 }, 1);
-
+            /*
             PolyCurve right = new PolyCurve();
             right.Append(rightPlanarUp);
             right.Append(rightLoop);
-            right.Append(rightPlanarDown);
+            right.Append(rightPlanarDown);*/
+
+            Curve right = Curve.JoinCurves(new List<Curve>() { rightPlanarUp, rightLoop, rightPlanarDown }, documentTolerance, true)[0];
 
             // Left Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve leftLoop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oLeftUp01, leftUp02, leftVertexPt, leftDown02, oLeftDown01 }, 2);
+                new List<Point3d>() { oLeftUp01, leftUp02, leftVertexPt, leftDown02, oLeftDown01 }, curveDegree);
 
             Curve leftPlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { leftUp01, oLeftUp01 }, 1);
@@ -404,10 +407,13 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve leftPlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oLeftDown01, leftDown01 }, 1);
 
+            /*
             PolyCurve left = new PolyCurve();
             left.Append(leftPlanarUp);
             left.Append(leftLoop);
-            left.Append(leftPlanarDown);
+            left.Append(leftPlanarDown);*/
+
+            Curve left = Curve.JoinCurves(new List<Curve>() { leftPlanarUp, leftLoop, leftPlanarDown }, documentTolerance, true)[0];
 
             // compare their polygon index to sort the lofting sequence 
             #region compair polygon index
@@ -427,7 +433,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                             (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] < leftIndex[l + 3]))
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<PolyCurve>() { right, left },
+                                new List<Curve>() { right, left },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
                                 false
@@ -445,7 +451,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                                  (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] >= leftIndex[l + 3]))
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<PolyCurve>() { left, right },
+                                new List<Curve>() { left, right },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
                                 false
@@ -462,7 +468,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                         else if (rightIndex[r + 3] >= leftIndex[l + 3])
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<PolyCurve>() { right, left },
+                                new List<Curve>() { right, left },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
                                 false
@@ -479,7 +485,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                         else if (rightIndex[r + 3] < leftIndex[l + 3])
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<PolyCurve>() { left, right },
+                                new List<Curve>() { left, right },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
                                 false
@@ -595,18 +601,20 @@ namespace Pavillion2015.Gene_UpdatedCode
 
 
             Curve right1Loop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oUpTPI01, ctUpTPI1, vertexPtRight1, ctDownTPI1, oDownTPI01 }, 2);
+                new List<Point3d>() { oUpTPI01, ctUpTPI1, vertexPtRight1, ctDownTPI1, oDownTPI01 }, curveDegree);
 
             Curve right1PlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { upTPI, oUpTPI01 }, 1);
 
             Curve right1PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oDownTPI01, downTPI }, 1);
-
+            /*
             PolyCurve right1 = new PolyCurve();
             right1.Append(right1PlanarUp);
             right1.Append(right1Loop);
-            right1.Append(right1PlanarDown);
+            right1.Append(right1PlanarDown);*/
+            Curve right1 = Curve.JoinCurves(new List<Curve>() { right1PlanarUp, right1Loop, right1PlanarDown }, documentTolerance, true)[0];
+
             #endregion Curves Right 1
 
             //---- Curves Left 1 -----------------------------------------------------------
@@ -617,7 +625,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d vertexPtLeft1 = (CurvePointiness * vertexPt1) + ((1 - CurvePointiness) * min_vertexPtLeft1);
 
             Curve left1Loop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oVertexPtUpM1, ctPtUp1, vertexPtLeft1, ctPtDown1, oVertexPtDownM1 }, 2);
+                new List<Point3d>() { oVertexPtUpM1, ctPtUp1, vertexPtLeft1, ctPtDown1, oVertexPtDownM1 }, curveDegree);
 
             Curve left1PlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { vertexPtUpM, oVertexPtUpM1 }, 1);
@@ -625,10 +633,13 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve left1PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oVertexPtDownM1, vertexPtDownM }, 1);
 
+            /*
             PolyCurve left1 = new PolyCurve();
             left1.Append(left1PlanarUp);
             left1.Append(left1Loop);
-            left1.Append(left1PlanarDown);
+            left1.Append(left1PlanarDown);*/
+            Curve left1 = Curve.JoinCurves(new List<Curve>() { left1PlanarUp, left1Loop, left1PlanarDown }, documentTolerance, true)[0];
+            
             #endregion Curves Left 1
 
 
@@ -640,7 +651,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d vertexPtRight2 = (CurvePointiness * vertexPt2) + ((1 - CurvePointiness) * min_vertexPtRight2);
 
             Curve right2Loop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oUpTPI02, ctUpTPI2, vertexPtRight2, ctDownTPI2, oDownTPI02 }, 2);
+                new List<Point3d>() { oUpTPI02, ctUpTPI2, vertexPtRight2, ctDownTPI2, oDownTPI02 }, curveDegree);
 
             Curve right2PlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { upTPI, oUpTPI02 }, 1);
@@ -648,10 +659,13 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve right2PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oDownTPI02, downTPI }, 1);
 
+            /*
             PolyCurve right2 = new PolyCurve();
             right2.Append(right2PlanarUp);
             right2.Append(right2Loop);
-            right2.Append(right2PlanarDown);
+            right2.Append(right2PlanarDown);*/
+            Curve right2 = Curve.JoinCurves(new List<Curve>() { right2PlanarUp, right2Loop, right2PlanarDown }, documentTolerance, true)[0];
+
             #endregion Curves Right 2
 
             //---- Curves Left 2 -----------------------------------------------------------
@@ -662,7 +676,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d vertexPtLeft2 = (CurvePointiness * vertexPt2) + ((1 - CurvePointiness) * min_vertexPtLeft2);
 
             Curve left2Loop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oVertexPtUpM2, ctPtUp2, vertexPtLeft2, ctPtDown2, oVertexPtDownM2 }, 2);
+                new List<Point3d>() { oVertexPtUpM2, ctPtUp2, vertexPtLeft2, ctPtDown2, oVertexPtDownM2 }, curveDegree);
 
             Curve left2PlanarUp = Curve.CreateControlPointCurve(
                 new List<Point3d>() { vertexPtUpM, oVertexPtUpM2 }, 1);
@@ -670,17 +684,20 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve left2PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oVertexPtDownM2, vertexPtDownM }, 1);
 
+            /*
             PolyCurve left2 = new PolyCurve();
             left2.Append(left2PlanarUp);
             left2.Append(left2Loop);
-            left2.Append(left2PlanarDown);
+            left2.Append(left2PlanarDown);*/
+            Curve left2 = Curve.JoinCurves(new List<Curve>() { left2PlanarUp, left2Loop, left2PlanarDown }, documentTolerance, true)[0];
+
             #endregion Curves Left 2
 
 
             // sorting sequence 
 
             Brep[] brep1 = Brep.CreateFromLoft(
-                       new List<PolyCurve>() { right1, left1 },
+                       new List<Curve>() { right1, left1 },
                        Point3d.Unset, Point3d.Unset,
                        LoftType.Normal,
                        false
@@ -833,24 +850,12 @@ namespace Pavillion2015.Gene_UpdatedCode
                 distValue = ICD.Utils.Distance(v.Position, closestPt);
                 verticesValues.Add(distValue);
             }
-            /*
+            
             // remap
             double max = verticesValues.Max();
             double min = verticesValues.Min();
 
             // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
-            for (int i = 0; i < verticesValues.Count; i++)
-                verticesValues[i] = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
-            */
-
-            // remap
-            //=================================== EDITED BY JULIAN =============================================
-            double max = verticesValues.Max();
-            double min = verticesValues.Min();
-
-            // map(value, low1, high1, low2, high2) = > low2 + (value - low1) * (high2 - low2) / (high1 - low1)
-
-
             // ---- remap curveVerticesValues ------------------------------------------------------------------
             for (int i = 0; i < verticesValues.Count; i++)
             {
@@ -864,7 +869,6 @@ namespace Pavillion2015.Gene_UpdatedCode
                 double remapedValue = iPlanarOffsetScaleMin + (verticesValues[i] - min) * (iPlanarOffsetScaleMax - iPlanarOffsetScaleMin) / (max - min);
                 planarVerticesValues.Add(remapedValue);
             }
-            //=================================== END EDITED BY JULIAN =========================================
         }
 
         private void triLoop()
@@ -1000,8 +1004,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d aA2 = (CurvePointiness * max_aA) + ((1 - CurvePointiness) * min_aA2);
 
             // Create Curves
-            Curve profileCurve1 = Curve.CreateControlPointCurve(new List<Point3d>() { oab, aab, aA1, AAB, oAB }, 2);
-            Curve profileCurve2 = Curve.CreateControlPointCurve(new List<Point3d>() { oac, aac, aA2, AAC, oAC }, 2);
+            Curve profileCurve1 = Curve.CreateControlPointCurve(new List<Point3d>() { oab, aab, aA1, AAB, oAB }, curveDegree);
+            Curve profileCurve2 = Curve.CreateControlPointCurve(new List<Point3d>() { oac, aac, aA2, AAC, oAC }, curveDegree);
 
             oTriLoopCurves.Add(profileCurve1, path.AppendElement(item));
             oTriLoopCurves.Add(profileCurve2, path.AppendElement(item));

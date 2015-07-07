@@ -55,13 +55,13 @@
 //            DevelopableLofterError developableLofterError = DevelopableLofterError.CURVE_EXTENSION_FAILED;
 
 //            EvoluteDevelopableLofting.DevelopableLofter(
-//                ref iFirstCurve, 
-//                ref iSecondCurve, 
-//                iClosenessToTolerance, 
-//                DevelopableLofterDevelopabilityLevel.VERYTIGHT, 
-//                DevelopableLofterSideExtend.EXTEND_BOTH, 
-//                iNumberOfControlPoints, 
-//                ref oBrep, 
+//                ref iFirstCurve,
+//                ref iSecondCurve,
+//                iClosenessToTolerance,
+//                DevelopableLofterDevelopabilityLevel.VERYTIGHT,
+//                DevelopableLofterSideExtend.EXTEND_BOTH,
+//                iNumberOfControlPoints,
+//                ref oBrep,
 //                ref developableLofterError);
 
 //            DA.SetData("Info", developableLofterError.ToString());
