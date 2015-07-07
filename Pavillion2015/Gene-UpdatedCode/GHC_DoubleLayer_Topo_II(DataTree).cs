@@ -1160,8 +1160,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
 
             // do EffectorHoles
-            List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, item);
-            List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, item);
+            List<Point3d> EffectorHoleTop = EffectorHoles(A, B, C, M, oAB, oAC, item);
+            List<Point3d> EffectorHoleBottom = EffectorHoles(a, b, c, m, oab, oac, item);
 
             foreach (Point3d pt in EffectorHoleTop)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(1));
@@ -1169,9 +1169,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             foreach (Point3d pt in EffectorHoleBottom)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(0));
         }
-
-
-        private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, int idx)
+        
+        private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, Point3d oab, Point3d oac, int idx)
         {
             double distance1 = 0.075;
             double distance2 = 0.145;
@@ -1180,17 +1179,34 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             List<Point3d> effectorHoles = new List<Point3d>();
 
+            // check distance to end-of-planarity-line
+            Vector3d v_toPlanarLine = (0.5 * (oac + oab)) - m;
+            
+            if(v_toPlanarLine.Length < 0.145)
+            {
+                distance1 = 0.035;
+                distance2 = 0.075;
+            }
+
             // for 1st stipe (main stripe)
             Vector3d v_am = a - m;
             v_am.Unitize();
 
             // for 2nd Stripe
             if (idx == 1)
-            { v_am.Rotate(angleRadians, normal); }
+            {
+                v_am = c - m;
+                v_am.Unitize();
+                v_am.Rotate(angleRadians, normal); 
+            }
 
             // for 3rd Stripe
             else if (idx == 2)
-            { v_am.Rotate((2 * angleRadians), normal); }
+            {
+                v_am = b - m;
+                v_am.Unitize();
+                v_am.Rotate((2 * angleRadians), normal); 
+            }
 
             Point3d pt1 = m + (v_am * distance1);
             Point3d pt2 = m + (v_am * distance2);
