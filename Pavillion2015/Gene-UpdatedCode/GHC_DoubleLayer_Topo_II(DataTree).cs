@@ -1006,9 +1006,16 @@ namespace Pavillion2015.Gene_UpdatedCode
             // Create Curves
             Curve profileCurve1 = Curve.CreateControlPointCurve(new List<Point3d>() { oab, aab, aA1, AAB, oAB }, curveDegree);
             Curve profileCurve2 = Curve.CreateControlPointCurve(new List<Point3d>() { oac, aac, aA2, AAC, oAC }, curveDegree);
+            Curve profileCrv11 = Curve.CreateControlPointCurve(new List<Point3d>() { ab, oab }, 1);
+            Curve profileCrv12 = Curve.CreateControlPointCurve(new List<Point3d>() { oAB, AB }, 1);
+            Curve profileCrv21 = Curve.CreateControlPointCurve(new List<Point3d>() { ac, oac }, 1);
+            Curve profileCrv22 = Curve.CreateControlPointCurve(new List<Point3d>() { oAC, AC }, 1);
 
-            oTriLoopCurves.Add(profileCurve1, path.AppendElement(item));
-            oTriLoopCurves.Add(profileCurve2, path.AppendElement(item));
+            Curve profileCurveNew1 = Curve.JoinCurves(new List<Curve>() { profileCrv11, profileCurve1, profileCrv12 }, documentTolerance, true)[0];
+            Curve profileCurveNew2 = Curve.JoinCurves(new List<Curve>() { profileCrv21, profileCurve2, profileCrv22 }, documentTolerance, true)[0];
+
+            oTriLoopCurves.Add(profileCurveNew1, path.AppendElement(item));
+            oTriLoopCurves.Add(profileCurveNew2, path.AppendElement(item));
 
             if (iPolySrf)
             {
