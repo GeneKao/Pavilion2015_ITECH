@@ -60,7 +60,6 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         List<int[]> indexSortPolygon = null;
 
-
         List<double> verticesValues = null;  // General Distance Relation to Attractor(s) ( before remaping to Min/Max - Range )
 
         List<double> curveVerticesValues = null;  // relative offset factors for individual opnening sizes (remaped verticesValues to iTangentScaleMin - iTangentScaleMax - range)
@@ -420,6 +419,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // dataTree 
             int plateID = iPolyLineID[occupyiedVertex];
+            plateID = -10 - plateID;     // prevent -1 situation
 
             GH_Path path = new GH_Path(plateID);
 
@@ -440,11 +440,11 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 );
                             if (brep.Length > 0)
                             {
-                                oDualLoop1.Add(brep[0], path);
-                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+                                oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l+3]));
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(leftIndex[l + 3]));
 
-                                oDualLoop1Curves.Add(left, path);
-                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path.AppendElement(leftIndex[l + 3]));
+                                oDualLoop1Curves.Add(right, path.AppendElement(leftIndex[l + 3]));
                             }
                         }
                         else if ((rightIndex[r + 3] == 0 && leftIndex[l + 3] != 1) ||
@@ -458,11 +458,11 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 );
                             if (brep.Length > 0)
                             {
-                                oDualLoop1.Add(brep[0], path);
-                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+                                oDualLoop1.Add(brep[0], path.AppendElement(rightIndex[r + 3]));
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(rightIndex[r + 3]));
 
-                                oDualLoop1Curves.Add(right, path);
-                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path.AppendElement(rightIndex[r + 3]));
+                                oDualLoop1Curves.Add(left, path.AppendElement(rightIndex[r + 3]));
                             }
                         }
                         else if (rightIndex[r + 3] >= leftIndex[l + 3])
@@ -475,11 +475,11 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 );
                             if (brep.Length > 0)
                             {
-                                oDualLoop1.Add(brep[0], path);
-                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+                                oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l + 3]));
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(leftIndex[l + 3]));
 
-                                oDualLoop1Curves.Add(left, path);
-                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path.AppendElement(leftIndex[l + 3]));
+                                oDualLoop1Curves.Add(right, path.AppendElement(leftIndex[l + 3]));
                             }
                         }
                         else if (rightIndex[r + 3] < leftIndex[l + 3])
@@ -492,11 +492,11 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 );
                             if (brep.Length > 0)
                             {
-                                oDualLoop1.Add(brep[0], path);
-                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+                                oDualLoop1.Add(brep[0], path.AppendElement(rightIndex[r + 3]));
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(rightIndex[r + 3]));
 
-                                oDualLoop1Curves.Add(right, path);
-                                oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path.AppendElement(rightIndex[r + 3]));
+                                oDualLoop1Curves.Add(left, path.AppendElement(rightIndex[r + 3]));
                             }
                         }
             #endregion compair polygon index
