@@ -382,30 +382,30 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Right Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve rightLoop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oRightUp01, rightUp02, rightVertexPt, rightDown02, oRightDown01 }, curveDegree);
+                new List<Point3d>() { oRightDown01, rightDown02, rightVertexPt, rightUp02, oRightUp01 }, curveDegree);
 
             Curve rightPlanarUp = Curve.CreateControlPointCurve(
-                new List<Point3d>() { rightUp01, oRightUp01 }, 1);
+                new List<Point3d>() { oRightUp01, rightUp01 }, 1);
 
             Curve rightPlanarDown = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oRightDown01, rightDown01 }, 1);
+                new List<Point3d>() { rightDown01, oRightDown01 }, 1);
             /*
             PolyCurve right = new PolyCurve();
             right.Append(rightPlanarUp);
             right.Append(rightLoop);
             right.Append(rightPlanarDown);*/
 
-            Curve right = Curve.JoinCurves(new List<Curve>() { rightPlanarUp, rightLoop, rightPlanarDown }, documentTolerance, true)[0];
+            Curve right = Curve.JoinCurves(new List<Curve>() { rightPlanarDown, rightLoop, rightPlanarUp }, documentTolerance, true)[0];
 
             // Left Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve leftLoop = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oLeftUp01, leftUp02, leftVertexPt, leftDown02, oLeftDown01 }, curveDegree);
+                new List<Point3d>() { oLeftDown01, leftDown02, leftVertexPt, leftUp02, oLeftUp01 }, curveDegree);
 
             Curve leftPlanarUp = Curve.CreateControlPointCurve(
-                new List<Point3d>() { leftUp01, oLeftUp01 }, 1);
+                new List<Point3d>() { oLeftUp01, leftUp01 }, 1);
 
             Curve leftPlanarDown = Curve.CreateControlPointCurve(
-                new List<Point3d>() { oLeftDown01, leftDown01 }, 1);
+                new List<Point3d>() { leftDown01, oLeftDown01 }, 1);
 
             /*
             PolyCurve left = new PolyCurve();
@@ -413,7 +413,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             left.Append(leftLoop);
             left.Append(leftPlanarDown);*/
 
-            Curve left = Curve.JoinCurves(new List<Curve>() { leftPlanarUp, leftLoop, leftPlanarDown }, documentTolerance, true)[0];
+            Curve left = Curve.JoinCurves(new List<Curve>() { leftPlanarDown, leftLoop, leftPlanarUp }, documentTolerance, true)[0];
 
             // compare their polygon index to sort the lofting sequence 
             #region compair polygon index
@@ -433,7 +433,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                             (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] < leftIndex[l + 3]))
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<Curve>() { right, left },
+                                new List<Curve>() { left, right },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
                                 false
@@ -443,31 +443,14 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 oDualLoop1.Add(brep[0], path);
                                 oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
 
-                                oDualLoop1Curves.Add(right, path);
                                 oDualLoop1Curves.Add(left, path);
+                                oDualLoop1Curves.Add(right, path);
                             }
                         }
                         else if ((rightIndex[r + 3] == 0 && leftIndex[l + 3] != 1) ||
                                  (leftIndex[l + 3] == 0 && rightIndex[r + 3] != 1) && (rightIndex[r + 3] >= leftIndex[l + 3]))
                         {
                             Brep[] brep = Brep.CreateFromLoft(
-                                new List<Curve>() { left, right },
-                                Point3d.Unset, Point3d.Unset,
-                                LoftType.Normal,
-                                false
-                                );
-                            if (brep.Length > 0)
-                            {
-                                oDualLoop1.Add(brep[0], path);
-                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
-
-                                oDualLoop1Curves.Add(left, path);
-                                oDualLoop1Curves.Add(right, path);
-                            }
-                        }
-                        else if (rightIndex[r + 3] >= leftIndex[l + 3])
-                        {
-                            Brep[] brep = Brep.CreateFromLoft(
                                 new List<Curve>() { right, left },
                                 Point3d.Unset, Point3d.Unset,
                                 LoftType.Normal,
@@ -482,7 +465,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 oDualLoop1Curves.Add(left, path);
                             }
                         }
-                        else if (rightIndex[r + 3] < leftIndex[l + 3])
+                        else if (rightIndex[r + 3] >= leftIndex[l + 3])
                         {
                             Brep[] brep = Brep.CreateFromLoft(
                                 new List<Curve>() { left, right },
@@ -497,6 +480,23 @@ namespace Pavillion2015.Gene_UpdatedCode
 
                                 oDualLoop1Curves.Add(left, path);
                                 oDualLoop1Curves.Add(right, path);
+                            }
+                        }
+                        else if (rightIndex[r + 3] < leftIndex[l + 3])
+                        {
+                            Brep[] brep = Brep.CreateFromLoft(
+                                new List<Curve>() { right, left },
+                                Point3d.Unset, Point3d.Unset,
+                                LoftType.Normal,
+                                false
+                                );
+                            if (brep.Length > 0)
+                            {
+                                oDualLoop1.Add(brep[0], path);
+                                oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path);
+
+                                oDualLoop1Curves.Add(right, path);
+                                oDualLoop1Curves.Add(left, path);
                             }
                         }
             #endregion compair polygon index
