@@ -32,6 +32,9 @@ namespace Pavillion2015.Gene_UpdatedCode
         double iPlanarOffsetScaleMax = double.NaN;
         double CurvePointiness = double.NaN;
 
+        double iOpeningWidthMin = double.NaN;
+        double iOpeningWidthMax = double.NaN;
+
         // output
         string oInfo = string.Empty;
         List<Point3d> oDebugList = null;
@@ -64,6 +67,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         List<double> curveVerticesValues = null;  // relative offset factors for individual opnening sizes (remaped verticesValues to iTangentScaleMin - iTangentScaleMax - range)
         List<double> planarVerticesValues = null;  // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
+        List<double> openingWidthVerticesValues = null;  // offset distance in document unit for individual opening widths
 
         double documentTolerance = DocumentTolerance();
         int curveDegree = 2;   // here change curve degree
@@ -93,6 +97,9 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list, new Point3d(10000, 10000, 10000));
             pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
             pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
+
+            pManager.AddNumberParameter("Opening Width Min", "OpeningWidth Min", "TangentScale Min [in doc. units]", GH_ParamAccess.item, 0.2);
+            pManager.AddNumberParameter("Opening Width Max", "OpeningWidth Max", "TangentScale Max [in doc. units]", GH_ParamAccess.item, 0.8);
 
         }
 
@@ -159,6 +166,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             verticesValues = new List<double>();
             curveVerticesValues = new List<double>();
             planarVerticesValues = new List<double>();
+            openingWidthVerticesValues = new List<double>();
 
         }
 
@@ -181,6 +189,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetData<double>("PlanarOffset Max", ref iPlanarOffsetScaleMax);
             DA.GetData<double>("Curve Pointiness", ref CurvePointiness);
 
+            DA.GetData<double>("Opening Width Min", ref iOpeningWidthMin);
+            DA.GetData<double>("Opening Width Max", ref iOpeningWidthMax);
             //------------------------------------------------------------
 
             storePlatesTPI();
@@ -869,6 +879,13 @@ namespace Pavillion2015.Gene_UpdatedCode
                 double remapedValue = iPlanarOffsetScaleMin + (verticesValues[i] - min) * (iPlanarOffsetScaleMax - iPlanarOffsetScaleMin) / (max - min);
                 planarVerticesValues.Add(remapedValue);
             }
+
+            // ---- remap openingWidthVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = iOpeningWidthMin + (verticesValues[i] - min) * (iOpeningWidthMax - iOpeningWidthMin) / (max - min);
+                openingWidthVerticesValues.Add(remapedValue);
+            }
         }
 
         private void triLoop()
@@ -968,24 +985,24 @@ namespace Pavillion2015.Gene_UpdatedCode
                           
             */
             #endregion correct offset
-
+            // not used
             #region Easy Offset
-
+            /*
             v_ab *= planarOffset;
             v_AB *= planarOffset;
             v_ac *= planarOffset;
             v_AC *= planarOffset;
-
+            */
             #endregion Easy Offset
 
 
             // create offset point 
-            Point3d oab = ab + v_ab;
-            Point3d oAB = AB + v_AB;
+            Point3d oab = ab + (v_ab * planarOffset);
+            Point3d oAB = AB + (v_AB * planarOffset);
 
             // create offset point 
-            Point3d oac = ac + v_ac;
-            Point3d oAC = AC + v_AC;
+            Point3d oac = ac + (v_ac * planarOffset);
+            Point3d oAC = AC + (v_AC * planarOffset);
 
 
             double curveScaler = curveVerticesValues[firstVertexIndex];
@@ -995,6 +1012,30 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d AAC = curveScaler * A + (1.0 - curveScaler) * oAC;
             Point3d aac = curveScaler * a + (1.0 - curveScaler) * oac;
+
+
+            double openingScaler = openingWidthVerticesValues[firstVertexIndex];
+
+            Point3d openingAAB = (-1 * v_AB * openingScaler) + A;
+            Point3d openingaab = (-1 * v_ab * openingScaler) + a;
+
+            Point3d openingAAC = (-1 * v_AC * openingScaler) + A;
+            Point3d openingaac = (-1 * v_ac * openingScaler) + a;
+
+            // Condition, choose between Opening Width and tangentscale
+
+            if (new Vector3d(AAB - A).Length > openingScaler)
+                AAB = openingAAB;
+
+            if (new Vector3d(aab - a).Length > openingScaler)
+                aab = openingaab;
+
+            if (new Vector3d(AAC - A).Length > openingScaler)
+                AAC = openingAAC;
+
+            if (new Vector3d(aac - a).Length > openingScaler)
+                aac = openingaac;
+
 
             // Pointiness of the Surface
             Point3d max_aA = 0.5 * (a + A);
