@@ -339,7 +339,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             if (iVertexStatus[vertex1] == false && iVertexStatus[vertex2] == true) { vertex = vertex1; occupyiedVertex = vertex2; }
             else if (iVertexStatus[vertex2] == false && iVertexStatus[vertex1] == true) { vertex = vertex2; occupyiedVertex = vertex1; }
-            else { oInfo += "got it..."; }
+            else { oInfo += "bug found..."; }
 
 
             // layer up
@@ -520,6 +520,13 @@ namespace Pavillion2015.Gene_UpdatedCode
             GH_Path path = new GH_Path(triangleIndex);
 
             Edge edge = iSpringMesh.Edges[edgeIndex];
+
+            // added for recognizing where is the plate - plate id
+            int occupyiedVertex = edge.FirstAdjacentVertexIndex;
+            if (iVertexStatus[edge.FirstAdjacentVertexIndex]) { occupyiedVertex = edge.FirstAdjacentVertexIndex; }
+            if (edge.SecondAdjacentVertexIndex > 0 && iVertexStatus[edge.SecondAdjacentVertexIndex]) { occupyiedVertex = edge.SecondAdjacentVertexIndex; }
+            int plateID = iPolyLineID[occupyiedVertex];
+            plateID = -10 - plateID;
 
             // vertex point
             int vertex1 = edge.FirstVertexIndex;
@@ -738,7 +745,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                     if (brep1.Length > 0)
                     {
                         oDualLoop2.Add(brepN1[0], path.AppendElement(0));
-                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(0));
 
                         oDualLoop2Curves.Add(right1, path.AppendElement(0));
                         oDualLoop2Curves.Add(left1, path.AppendElement(0));
@@ -747,7 +754,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 else
                 {
                     oDualLoop2.Add(brep1[0], path.AppendElement(0));
-                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(0));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(0));
 
                     oDualLoop2Curves.Add(left1, path.AppendElement(0));
                     oDualLoop2Curves.Add(right1, path.AppendElement(0));
@@ -787,7 +794,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                     if (brep2.Length > 0)
                     {
                         oDualLoop2.Add(brepN2[0], path.AppendElement(1));
-                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+                        oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(1));
 
                         oDualLoop2Curves.Add(right2, path.AppendElement(1));
                         oDualLoop2Curves.Add(left2, path.AppendElement(1));
@@ -796,7 +803,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 else
                 {
                     oDualLoop2.Add(brep2[0], path.AppendElement(1));
-                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString(), path.AppendElement(1));
+                    oDualLoop2ID.Add("J;" + triangleIndex.ToString() + ";" + neighbourTriIndex.ToString() + ";" + neighbour2TriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(1));
 
                     oDualLoop2Curves.Add(left2, path.AppendElement(1));
                     oDualLoop2Curves.Add(right2, path.AppendElement(1));
