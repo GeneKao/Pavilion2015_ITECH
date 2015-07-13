@@ -18,6 +18,10 @@ namespace Pavillion2015
         double iMaxThickness = double.NaN;
         List<Point3d> iAttrThicknessPts = null;
         bool iHeightThickness = false;
+        // ------------------------------------------
+        List<Point3d> iClosedPanelPts = null;  // close panel second type
+        double iClosePanelDist = 0.001;
+        // ---------------------------------------------
         bool iAutoGenPlates = true;
         double iPlatesOffset = double.NaN;
         double iPlatesThreads = double.NaN;
@@ -32,6 +36,7 @@ namespace Pavillion2015
         List<bool> oVertexStatus = null;
         List<int> oPolyLineID = null;
         List<double> othickness = null;
+        List<bool> oVertexPanel2 = null;
 
         // internal use data
 
@@ -54,6 +59,10 @@ namespace Pavillion2015
             pManager.AddNumberParameter("Max. Thickness", "Max. Thickness", "Max. Thickness", GH_ParamAccess.item, 1.0);
             pManager.AddPointParameter("Attr. ThicknessPts", "Attr. ThicknessPts", "Attr. ThicknessPts", GH_ParamAccess.list, new Point3d(10000, 10000, 10000));
             pManager.AddBooleanParameter("H. EffectThickness", "H. EffectThickness", "H. EffectThickness", GH_ParamAccess.item, false);
+            // ------------------------------------------------
+            pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
+            pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
+            // ---------------------------------------------------
             pManager.AddBooleanParameter("Auto Gen Plates", "Auto Gen Plates", "Auto Gen Plates", GH_ParamAccess.item, true);
             pManager.AddNumberParameter("Plate Offset", "Plate Offset", "Plate Offset", GH_ParamAccess.item, 0.5);
             pManager.AddNumberParameter("Threads", "Threads", "Threads", GH_ParamAccess.item, 1.0);
@@ -71,6 +80,7 @@ namespace Pavillion2015
             pManager.AddNumberParameter("Thickness", "Thickness", "Thickness", GH_ParamAccess.list);
             pManager.AddBooleanParameter("Vertex Status", "Vertex Status", "Vertex Status", GH_ParamAccess.list);
             pManager.AddIntegerParameter("PolyLineID", "PolyLineID", "PolyLineID", GH_ParamAccess.list);
+            pManager.AddBooleanParameter("Vertex Panel2", "Vertex Panel2", "Vertex Panel2", GH_ParamAccess.list);
         }
 
 
@@ -79,6 +89,8 @@ namespace Pavillion2015
             // input
             iID = new List<int>();  
             iAttrThicknessPts = new List<Point3d>();
+            //--------------------------------------------------
+            iClosedPanelPts = new List<Point3d>();
 
             // output
             oInfo = string.Empty;
@@ -89,6 +101,7 @@ namespace Pavillion2015
             oVertexStatus = new List<bool>(); // true is plate occupied, false should put triLoop
             oPolyLineID = new List<int>(); // for vertex status access the order of polyline
             othickness = new List<double>();
+            oVertexPanel2 = new List<bool>();
 
             // internal use data
 
@@ -104,6 +117,10 @@ namespace Pavillion2015
             DA.GetData<double>("Max. Thickness", ref iMaxThickness);
             DA.GetDataList<Point3d>("Attr. ThicknessPts", iAttrThicknessPts);
             DA.GetData<bool>("H. EffectThickness", ref iHeightThickness);
+            // -----------------------------------------------------------------
+            DA.GetDataList<Point3d>("Closed Panel Area", iClosedPanelPts);
+            DA.GetData<double>("Panel Effect Area", ref iClosePanelDist);
+            // -------------------------------------------------------------------
             DA.GetData<bool>("Auto Gen Plates", ref iAutoGenPlates);
             DA.GetData<double>("Plate Offset", ref iPlatesOffset);
             DA.GetData<double>("Threads", ref iPlatesThreads);
@@ -121,6 +138,7 @@ namespace Pavillion2015
             {
                 oVertexStatus.Add(false);
                 oPolyLineID.Add(-1);
+                oVertexPanel2.Add(false);
             }
 
             ComputePlates();
@@ -137,6 +155,7 @@ namespace Pavillion2015
             DA.SetDataList("Thickness", othickness);
             DA.SetDataList("Vertex Status", oVertexStatus);
             DA.SetDataList("PolyLineID", oPolyLineID);
+            DA.SetDataList("Vertex Panel2", oVertexPanel2);
             // -----------------------------------------------------------
         }
 
@@ -144,21 +163,20 @@ namespace Pavillion2015
         // compute plate and output polyline
         public void ComputePlates()
         {
-            //vertex thickness value
-            /*
+            // set up second type of plate 
             for (int i = 0; i < oSpringMesh.Vertices.Count; i++)
             {
                 Point3d vertexPosition = oSpringMesh.Vertices[i].Position;
-                // different thickness
-                double k = vertexPosition.Z * 0.125;
-                othickness.Add(k * iMinThickness + (0.5 - k) * iMaxThickness);
-            }*/
-            
+                Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, vertexPosition);
+                if (ICD.Utils.Distance(closeVertice, vertexPosition) < iClosePanelDist)
+                    oVertexPanel2[i] = true;
+            }
+
             // attractor thickness
             for (int i = 0; i < oSpringMesh.Vertices.Count; i++)
             {
-
                 Point3d vertexPosition = oSpringMesh.Vertices[i].Position;
+
                 // different thickness
                 Point3d closestPt = Point3dList.ClosestPointInList(iAttrThicknessPts, vertexPosition);
                 double distValue = ICD.Utils.Distance(vertexPosition, closestPt);
@@ -168,9 +186,28 @@ namespace Pavillion2015
                     double k = vertexPosition.Z * 0.125; 
                     distValue *= k * iMinThickness + (0.5 - k) * iMaxThickness;
                 }
-
                 othickness.Add(distValue);
             }
+
+            // fix the second type plate area thickness
+            for (int i = 0; i < oSpringMesh.Vertices.Count; i++)
+            {
+                Vertex v = oSpringMesh.Vertices[i];
+                List<int> Neighbours = v.NeighborVertexIndices.ToList();
+                oInfo += "i = " + i.ToString() + ", value = " + oVertexPanel2[i] + "\n";
+                foreach ( int n in Neighbours)
+                {
+                    //if (oVertexPanel2[n] == true)
+                    //{
+                    oInfo += "n = " + n.ToString() + ", value = " + oVertexPanel2[n] + "\n";
+                        //oInfo += n.ToString() + " get it \n";
+                        double temp = othickness[n];
+                        othickness[i] = temp;
+                    //}
+                }
+                oInfo += "==============================\n";
+            }
+
             // remap
             double max = othickness.Max();
             double min = othickness.Min();

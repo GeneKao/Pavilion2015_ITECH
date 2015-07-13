@@ -26,8 +26,9 @@ namespace Pavillion2015.Gene_UpdatedCode
         double iTangentScaleMin = double.NaN;
         double iTangentScaleMax = double.NaN;
         List<Point3d> iAttractors = null;
-        List<Point3d> iClosedPanelPts = null;
-        double iClosePanelDist = 0.001;
+        //List<Point3d> iClosedPanelPts = null;
+        //double iClosePanelDist = 0.001;
+        List<bool> iVertexPanel2 = null;
         double iPlanarOffsetScaleMin = double.NaN;
         double iPlanarOffsetScaleMax = double.NaN;
         double CurvePointiness = double.NaN;
@@ -95,9 +96,9 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddNumberParameter("PlanarOffset Min", "PlanarOffset Min", "Controlls minimal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("PlanarOffset Max", "PlanarOffset Max", "Controlls maximal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.8);
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list, new Point3d(10000, 10000, 10000));
-            pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
-            pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
-
+            //pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
+            //pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
+            pManager.AddBooleanParameter("Vertex Panel2", "Vertex Panel2", "Vertex Panel2", GH_ParamAccess.list);
             pManager.AddNumberParameter("Opening Width Min", "OpeningWidth Min", "TangentScale Min [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("Opening Width Max", "OpeningWidth Max", "TangentScale Max [in doc. units]", GH_ParamAccess.item, 0.8);
 
@@ -134,7 +135,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             iPolyLineID = new List<int>(); // for vertex status access the order of polyline
             iThickness = new List<double>();
             iAttractors = new List<Point3d>();
-            iClosedPanelPts = new List<Point3d>();
+            //iClosedPanelPts = new List<Point3d>();
+            iVertexPanel2 = new List<bool>();
 
             // output
             oInfo = string.Empty;
@@ -183,8 +185,9 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetData<double>("TangentScale Min", ref iTangentScaleMin);
             DA.GetData<double>("TangentScale Max", ref iTangentScaleMax);
             DA.GetDataList<Point3d>("Attractors", iAttractors);
-            DA.GetDataList<Point3d>("Closed Panel Area", iClosedPanelPts);
-            DA.GetData<double>("Panel Effect Area", ref iClosePanelDist);
+            //DA.GetDataList<Point3d>("Closed Panel Area", iClosedPanelPts);
+            //DA.GetData<double>("Panel Effect Area", ref iClosePanelDist);
+            DA.GetDataList<bool>("Vertex Panel2", iVertexPanel2);
             DA.GetData<double>("PlanarOffset Min", ref iPlanarOffsetScaleMin);
             DA.GetData<double>("PlanarOffset Max", ref iPlanarOffsetScaleMax);
             DA.GetData<double>("Curve Pointiness", ref CurvePointiness);
@@ -1181,11 +1184,12 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
             #endregion single surface
 
-            #region close stripe
+            #region close panel
 
             // close panel
-            Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, iSpringMesh.Vertices[firstVertexIndex].Position);
-            if (ICD.Utils.Distance(closeVertice, iSpringMesh.Vertices[firstVertexIndex].Position) < iClosePanelDist)
+            //Point3d closeVertice = Point3dList.ClosestPointInList(iClosedPanelPts, iSpringMesh.Vertices[firstVertexIndex].Position);
+            //if (ICD.Utils.Distance(closeVertice, iSpringMesh.Vertices[firstVertexIndex].Position) < iClosePanelDist)
+            if (iVertexPanel2[firstVertexIndex])
             {
                 oClosedPanel.Add(
                     Brep.CreateFromLoft(
@@ -1205,7 +1209,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                     );
             }
 
-            #endregion close stripe
+            #endregion close panel
 
 
             // do EffectorHoles
