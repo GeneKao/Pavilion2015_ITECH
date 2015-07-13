@@ -96,9 +96,9 @@ C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015
 C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.pdb
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\bin\Pavillion2015.dll
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\bin\Pavillion2015.pdb
-\\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.csprojResolveAssemblyReference.cache
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.Properties.Resources.resources
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.csproj.GenerateResource.Cache
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.dll
 \\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.pdb
 C:\Users\w-lan\GitHub\Pavilion2015_ITECH\Pavillion2015\obj\Debug64\Pavillion2015.csprojResolveAssemblyReference.cache
+\\vmware-host\Shared Folders\Documents\Visual Studio 2013\Projects\ITECH\github\Pavillion2015_0.2.0\Pavillion2015\obj\Debug64\Pavillion2015.csprojResolveAssemblyReference.cache

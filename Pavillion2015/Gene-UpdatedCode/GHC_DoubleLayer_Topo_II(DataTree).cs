@@ -38,7 +38,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         // output
         string oInfo = string.Empty;
-        List<Point3d> oDebugList = null;
+        List<Vector3d> oDebugList = null;
         DataTree<Brep> oTriLoop = null;
         DataTree<string> oTriLoopID = null;
         DataTree<Curve> oTriLoopCurves = null;
@@ -140,7 +140,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // output
             oInfo = string.Empty;
-            oDebugList = new List<Point3d>();
+            oDebugList = new List<Vector3d>();
             oTriLoop = new DataTree<Brep>();
             oTriLoopID = new DataTree<string>();
             oTriLoopCurves = new DataTree<Curve>();
@@ -205,6 +205,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             triLoop();
 
             half_dualLoop();
+
+            oDebugList = vertexNormals;
 
             //------------------------------------------------------------
 
@@ -283,10 +285,11 @@ namespace Pavillion2015.Gene_UpdatedCode
                     }
                 }
             }
+            /*
             foreach (Point3d p in topCenterPts)
                 oDebugList.Add(p);
             foreach (Point3d p in bottomCenterPts)
-                oDebugList.Add(p);
+                oDebugList.Add(p);*/
 
         }
 
@@ -308,7 +311,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                     if ((iVertexStatus[vertex01] == true && iVertexStatus[vertex02] == false) ||
                         (iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == true)) half_dualLoop_type_1(i);
 
-                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
+                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] != false || iVertexStatus[edgeLocal.SecondAdjacentVertexIndex] != false) )
                     {
                         half_dualLoop_type_2(i, tri01, tri02);
                         half_dualLoop_type_2(i, tri02, tri01);
@@ -316,7 +320,8 @@ namespace Pavillion2015.Gene_UpdatedCode
                 }
                 else
                 {
-                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false))
+                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == true) )
                     {
                         half_dualLoop_type_2(i, tri01, -1); // give it -1 if no neighbour
                     }
@@ -409,6 +414,11 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Curve right = Curve.JoinCurves(new List<Curve>() { rightPlanarDown, rightLoop, rightPlanarUp }, documentTolerance, true)[0];
 
+            if (iPolySrf)
+            {
+                right = rightLoop;
+            }
+
             // Left Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve leftLoop = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oLeftDown01, leftDown02, leftVertexPt, leftUp02, oLeftUp01 }, curveDegree);
@@ -426,6 +436,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             left.Append(leftPlanarDown);*/
 
             Curve left = Curve.JoinCurves(new List<Curve>() { leftPlanarDown, leftLoop, leftPlanarUp }, documentTolerance, true)[0];
+
+            if (iPolySrf)
+            {
+                left = leftLoop;
+            }
 
             // compare their polygon index to sort the lofting sequence 
             #region compair polygon index
@@ -635,6 +650,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             right1.Append(right1PlanarDown);*/
             Curve right1 = Curve.JoinCurves(new List<Curve>() { right1PlanarDown, right1Loop, right1PlanarUp }, documentTolerance, true)[0];
 
+            if (iPolySrf) 
+            {
+                right1 = right1Loop;
+            }
+
             #endregion Curves Right 1
 
             //---- Curves Left 1 -----------------------------------------------------------
@@ -659,7 +679,12 @@ namespace Pavillion2015.Gene_UpdatedCode
             left1.Append(left1Loop);
             left1.Append(left1PlanarDown);*/
             Curve left1 = Curve.JoinCurves(new List<Curve>() { left1PlanarDown, left1Loop, left1PlanarUp }, documentTolerance, true)[0];
-            
+
+            if (iPolySrf)
+            {
+                //left1 = left1Loop;
+            }
+
             #endregion Curves Left 1
 
 
@@ -686,6 +711,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             right2.Append(right2PlanarDown);*/
             Curve right2 = Curve.JoinCurves(new List<Curve>() { right2PlanarDown, right2Loop, right2PlanarUp }, documentTolerance, true)[0];
 
+            if (iPolySrf)
+            {
+                right2 = right2Loop;
+            }
+
             #endregion Curves Right 2
 
             //---- Curves Left 2 -----------------------------------------------------------
@@ -710,6 +740,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             left2.Append(left2Loop);
             left2.Append(left2PlanarDown);*/
             Curve left2 = Curve.JoinCurves(new List<Curve>() { left2PlanarDown, left2Loop, left2PlanarUp }, documentTolerance, true)[0];
+
+            if (iPolySrf)
+            {
+                left2 = left2Loop;
+            }
 
             #endregion Curves Left 2
 

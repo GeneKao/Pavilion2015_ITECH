@@ -201,8 +201,8 @@ namespace Pavillion2015
                     //{
                     oInfo += "n = " + n.ToString() + ", value = " + oVertexPanel2[n] + "\n";
                         //oInfo += n.ToString() + " get it \n";
-                        double temp = othickness[n];
-                        othickness[i] = temp;
+                        //double temp = othickness[n];
+                        //othickness[i] = temp;
                     //}
                 }
                 oInfo += "==============================\n";
