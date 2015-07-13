@@ -402,9 +402,15 @@ namespace Pavillion2015.Gene_UpdatedCode
             PolyCurve right = new PolyCurve();
             right.Append(rightPlanarUp);
             right.Append(rightLoop);
-            right.Append(rightPlanarDown);*/
+            right.Append(rightPlanarDown);
+             */
 
             Curve right = Curve.JoinCurves(new List<Curve>() { rightPlanarDown, rightLoop, rightPlanarUp }, documentTolerance, true)[0];
+
+            if (iPolySrf)
+            {
+                right = rightLoop;
+            }
 
             // Left Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
             Curve leftLoop = Curve.CreateControlPointCurve(
@@ -423,6 +429,11 @@ namespace Pavillion2015.Gene_UpdatedCode
             left.Append(leftPlanarDown);*/
 
             Curve left = Curve.JoinCurves(new List<Curve>() { leftPlanarDown, leftLoop, leftPlanarUp }, documentTolerance, true)[0];
+
+            if (iPolySrf)
+            {
+                left = leftLoop;
+            }
 
             // compare their polygon index to sort the lofting sequence 
             #region compair polygon index
@@ -625,11 +636,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Curve right1PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { downTPI, oDownTPI01 }, 1);
-            /*
-            PolyCurve right1 = new PolyCurve();
-            right1.Append(right1PlanarUp);
-            right1.Append(right1Loop);
-            right1.Append(right1PlanarDown);*/
+
             Curve right1 = Curve.JoinCurves(new List<Curve>() { right1PlanarDown, right1Loop, right1PlanarUp }, documentTolerance, true)[0];
 
             #endregion Curves Right 1
@@ -650,13 +657,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve left1PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { vertexPtDownM, oVertexPtDownM1 }, 1);
 
-            /*
-            PolyCurve left1 = new PolyCurve();
-            left1.Append(left1PlanarUp);
-            left1.Append(left1Loop);
-            left1.Append(left1PlanarDown);*/
             Curve left1 = Curve.JoinCurves(new List<Curve>() { left1PlanarDown, left1Loop, left1PlanarUp }, documentTolerance, true)[0];
-            
+
             #endregion Curves Left 1
 
 
@@ -676,11 +678,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve right2PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { downTPI, oDownTPI02 }, 1);
 
-            /*
-            PolyCurve right2 = new PolyCurve();
-            right2.Append(right2PlanarUp);
-            right2.Append(right2Loop);
-            right2.Append(right2PlanarDown);*/
             Curve right2 = Curve.JoinCurves(new List<Curve>() { right2PlanarDown, right2Loop, right2PlanarUp }, documentTolerance, true)[0];
 
             #endregion Curves Right 2
@@ -701,11 +698,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             Curve left2PlanarDown = Curve.CreateControlPointCurve(
                 new List<Point3d>() { vertexPtDownM, oVertexPtDownM2 }, 1);
 
-            /*
-            PolyCurve left2 = new PolyCurve();
-            left2.Append(left2PlanarUp);
-            left2.Append(left2Loop);
-            left2.Append(left2PlanarDown);*/
             Curve left2 = Curve.JoinCurves(new List<Curve>() { left2PlanarDown, left2Loop, left2PlanarUp }, documentTolerance, true)[0];
 
             #endregion Curves Left 2
@@ -719,6 +711,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                        LoftType.Normal,
                        false
                        );
+
             if (brep1.Length > 0)
             {
                 //oDualLoop.Add(brep1[0]);
@@ -1011,7 +1004,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d oac = ac + (v_ac * planarOffset);
             Point3d oAC = AC + (v_AC * planarOffset);
 
-
+            
             double curveScaler = curveVerticesValues[firstVertexIndex];
 
             Point3d AAB = curveScaler * A + (1.0 - curveScaler) * oAB;
@@ -1042,6 +1035,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             if (new Vector3d(aac - a).Length > openingScaler)
                 aac = openingaac;
+
 
 
             // Pointiness of the Surface
