@@ -497,6 +497,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 LoftType.Normal,
                                 false
                                 );
+
+                            #region allow poly surface
+                            if (iPolySrf)
+                            {
+                                Brep[] brepPlanarUp = Brep.CreateFromLoft(
+                                    new List<Curve>() { leftPlanarUp, rightPlanarUp },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                Brep[] brepPlanarDown = Brep.CreateFromLoft(
+                                    new List<Curve>() { leftPlanarDown, rightPlanarDown },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                brep = Brep.JoinBreps(new List<Brep>() { brepPlanarDown[0], brep[0], brepPlanarUp[0] }, documentTolerance);
+                            }
+                            #endregion allow poly surface
+
                             if (brep.Length > 0)
                             {
                                 oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l + 3]));
@@ -515,6 +535,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 LoftType.Normal,
                                 false
                                 );
+
+                            #region allow poly surface
+                            if (iPolySrf)
+                            {
+                                Brep[] brepPlanarUp = Brep.CreateFromLoft(
+                                    new List<Curve>() { rightPlanarUp, leftPlanarUp },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                Brep[] brepPlanarDown = Brep.CreateFromLoft(
+                                    new List<Curve>() { rightPlanarDown, leftPlanarDown },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                brep = Brep.JoinBreps(new List<Brep>() { brepPlanarDown[0], brep[0], brepPlanarUp[0] }, documentTolerance);
+                            }
+                            #endregion allow poly surface
+
                             if (brep.Length > 0)
                             {
                                 oDualLoop1.Add(brep[0], path.AppendElement(rightIndex[r + 3]));
@@ -532,6 +572,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 LoftType.Normal,
                                 false
                                 );
+
+                            #region allow poly surface
+                            if (iPolySrf)
+                            {
+                                Brep[] brepPlanarUp = Brep.CreateFromLoft(
+                                    new List<Curve>() { leftPlanarUp, rightPlanarUp },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                Brep[] brepPlanarDown = Brep.CreateFromLoft(
+                                    new List<Curve>() { leftPlanarDown, rightPlanarDown },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                brep = Brep.JoinBreps(new List<Brep>() { brepPlanarDown[0], brep[0], brepPlanarUp[0] }, documentTolerance);
+                            }
+                            #endregion allow poly surface
+
                             if (brep.Length > 0)
                             {
                                 oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l + 3]));
@@ -549,6 +609,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 LoftType.Normal,
                                 false
                                 );
+
+                            #region allow poly surface
+                            if (iPolySrf)
+                            {
+                                Brep[] brepPlanarUp = Brep.CreateFromLoft(
+                                    new List<Curve>() { rightPlanarUp, leftPlanarUp },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                Brep[] brepPlanarDown = Brep.CreateFromLoft(
+                                    new List<Curve>() { rightPlanarDown, leftPlanarDown },
+                                    Point3d.Unset, Point3d.Unset,
+                                    LoftType.Normal, false
+                                    );
+
+                                brep = Brep.JoinBreps(new List<Brep>() { brepPlanarDown[0], brep[0], brepPlanarUp[0] }, documentTolerance);
+                            }
+                            #endregion allow poly surface
+
                             if (brep.Length > 0)
                             {
                                 oDualLoop1.Add(brep[0], path.AppendElement(rightIndex[r + 3]));
@@ -840,6 +920,27 @@ namespace Pavillion2015.Gene_UpdatedCode
                        LoftType.Normal,
                        false
                        );
+
+            #region allow poly surface
+            if (iPolySrf)
+            {
+                Brep[] brep1PlanarUp = Brep.CreateFromLoft(
+                    new List<Curve>() { left1PlanarUp, right1PlanarUp },
+                    Point3d.Unset, Point3d.Unset,
+                    LoftType.Normal, false
+                    );
+
+                Brep[] brep1PlanarDown = Brep.CreateFromLoft(
+                    new List<Curve>() { left1PlanarDown, right1PlanarDown },
+                    Point3d.Unset, Point3d.Unset,
+                    LoftType.Normal, false
+                    );
+
+                brep1 = Brep.JoinBreps(new List<Brep>(){brep1PlanarDown[0], brep1[0], brep1PlanarUp[0]}, documentTolerance);
+            }
+            #endregion allow poly surface
+
+
             if (brep1.Length > 0)
             {
                 //oDualLoop.Add(brep1[0]);
@@ -863,6 +964,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                        LoftType.Normal,
                        false
                        );
+
+                    #region allow poly surface
+                    if (iPolySrf)
+                    {
+                        Brep[] brepN1PlanarUp = Brep.CreateFromLoft(
+                            new List<Curve>() { right1PlanarUp, left1PlanarUp },
+                            Point3d.Unset, Point3d.Unset,
+                            LoftType.Normal, false
+                            );
+
+                        Brep[] brepN1PlanarDown = Brep.CreateFromLoft(
+                            new List<Curve>() { right1PlanarDown, left1PlanarDown },
+                            Point3d.Unset, Point3d.Unset,
+                            LoftType.Normal, false
+                            );
+
+                        brepN1 = Brep.JoinBreps(new List<Brep>() { brepN1PlanarDown[0], brepN1[0], brepN1PlanarUp[0] }, documentTolerance);
+                    }
+                    #endregion allow poly surface
+
                     if (brep1.Length > 0)
                     {
                         oDualLoop2.Add(brepN1[0], path.AppendElement(0));
@@ -889,6 +1010,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                        LoftType.Normal,
                        false
                        );
+
+            #region allow poly surface
+            if (iPolySrf)
+            {
+                Brep[] brep2PlanarUp = Brep.CreateFromLoft(
+                    new List<Curve>() { left2PlanarUp, right2PlanarUp },
+                    Point3d.Unset, Point3d.Unset,
+                    LoftType.Normal, false
+                    );
+
+                Brep[] brep2PlanarDown = Brep.CreateFromLoft(
+                    new List<Curve>() { left2PlanarDown, right2PlanarDown },
+                    Point3d.Unset, Point3d.Unset,
+                    LoftType.Normal, false
+                    );
+
+                brep2 = Brep.JoinBreps(new List<Brep>() { brep2PlanarDown[0], brep2[0], brep2PlanarUp[0] }, documentTolerance);
+            }
+            #endregion allow poly surface
+
             if (brep2.Length > 0)
             {
                 //oDualLoop.Add(brep2[0]);
@@ -912,6 +1053,26 @@ namespace Pavillion2015.Gene_UpdatedCode
                        LoftType.Normal,
                        false
                        );
+
+                    #region allow poly surface
+                    if (iPolySrf)
+                    {
+                        Brep[] brepN2PlanarUp = Brep.CreateFromLoft(
+                            new List<Curve>() { right2PlanarUp, left2PlanarUp },
+                            Point3d.Unset, Point3d.Unset,
+                            LoftType.Normal, false
+                            );
+
+                        Brep[] brepN2PlanarDown = Brep.CreateFromLoft(
+                            new List<Curve>() { right2PlanarDown, left2PlanarDown },
+                            Point3d.Unset, Point3d.Unset,
+                            LoftType.Normal, false
+                            );
+
+                        brepN2 = Brep.JoinBreps(new List<Brep>() { brepN2PlanarDown[0], brepN2[0], brepN2PlanarUp[0] }, documentTolerance);
+                    }
+                    #endregion allow poly surface
+
                     if (brep2.Length > 0)
                     {
                         oDualLoop2.Add(brepN2[0], path.AppendElement(1));
