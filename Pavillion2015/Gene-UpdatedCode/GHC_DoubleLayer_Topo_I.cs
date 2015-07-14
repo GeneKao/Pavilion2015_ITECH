@@ -192,10 +192,10 @@ namespace Pavillion2015
             // fix the second type plate area thickness
             for (int i = 0; i < oSpringMesh.Vertices.Count; i++)
             {
-                Vertex v = oSpringMesh.Vertices[i];
+                Vertex vt = oSpringMesh.Vertices[i];
                 //List<int> Neighbours = v.NeighborVertexIndices;
                 oInfo += "i = " + i.ToString() + ", value = " + oVertexPanel2[i] + "\n";
-                foreach (int n in v.NeighborVertexIndices)
+                foreach (int n in vt.NeighborVertexIndices)
                 {
                     //if (oVertexPanel2[n] == true)
                     //{
@@ -380,7 +380,7 @@ namespace Pavillion2015
                 int topoIndex = iRhinoMesh.TopologyVertices.TopologyVertexIndex(i);
                 int[] connectIndex = iRhinoMesh.TopologyVertices.ConnectedTopologyVertices(topoIndex);
                 for (int j = 0; j < connectIndex.Length; j++)
-                    oSpringMesh.Vertices[i].NeighborVertexIndices.Add(iRhinoMesh.TopologyVertices.MeshVertexIndices(j)[0]);
+                    oSpringMesh.Vertices[i].NeighborVertexIndices.Add(iRhinoMesh.TopologyVertices.MeshVertexIndices(connectIndex[j])[0]);
             }
 
             foreach (MeshFace face in iRhinoMesh.Faces)

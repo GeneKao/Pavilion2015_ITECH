@@ -56,7 +56,7 @@ namespace Pavillion2015
                 int topoIndex = iRhinoMesh.TopologyVertices.TopologyVertexIndex(i);
                 int[] connectIndex = iRhinoMesh.TopologyVertices.ConnectedTopologyVertices(topoIndex);
                 for (int j = 0; j < connectIndex.Length; j++)
-                    oSpringMesh.Vertices[i].NeighborVertexIndices.Add(iRhinoMesh.TopologyVertices.MeshVertexIndices(j)[0]);
+                    oSpringMesh.Vertices[i].NeighborVertexIndices.Add(iRhinoMesh.TopologyVertices.MeshVertexIndices(connectIndex[j])[0]);
             }
 
             foreach (MeshFace face in iRhinoMesh.Faces)
