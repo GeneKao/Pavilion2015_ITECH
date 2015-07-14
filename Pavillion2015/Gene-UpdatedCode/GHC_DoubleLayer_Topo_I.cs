@@ -59,10 +59,8 @@ namespace Pavillion2015
             pManager.AddNumberParameter("Max. Thickness", "Max. Thickness", "Max. Thickness", GH_ParamAccess.item, 1.0);
             pManager.AddPointParameter("Attr. ThicknessPts", "Attr. ThicknessPts", "Attr. ThicknessPts", GH_ParamAccess.list, new Point3d(10000, 10000, 10000));
             pManager.AddBooleanParameter("H. EffectThickness", "H. EffectThickness", "H. EffectThickness", GH_ParamAccess.item, false);
-            // ------------------------------------------------
             pManager.AddPointParameter("Closed Panel Area", "Closed Panel Area", "Closed Panel Area", GH_ParamAccess.list, new Point3d());
             pManager.AddNumberParameter("Panel Effect Area", "Panel Effect Area", "Panel Effect Area", GH_ParamAccess.item, 0.001);
-            // ---------------------------------------------------
             pManager.AddBooleanParameter("Auto Gen Plates", "Auto Gen Plates", "Auto Gen Plates", GH_ParamAccess.item, true);
             pManager.AddNumberParameter("Plate Offset", "Plate Offset", "Plate Offset", GH_ParamAccess.item, 0.5);
             pManager.AddNumberParameter("Threads", "Threads", "Threads", GH_ParamAccess.item, 1.0);
@@ -87,9 +85,8 @@ namespace Pavillion2015
         protected override void BeforeSolveInstance()
         {
             // input
-            iID = new List<int>();  
+            iID = new List<int>();
             iAttrThicknessPts = new List<Point3d>();
-            //--------------------------------------------------
             iClosedPanelPts = new List<Point3d>();
 
             // output
@@ -117,10 +114,8 @@ namespace Pavillion2015
             DA.GetData<double>("Max. Thickness", ref iMaxThickness);
             DA.GetDataList<Point3d>("Attr. ThicknessPts", iAttrThicknessPts);
             DA.GetData<bool>("H. EffectThickness", ref iHeightThickness);
-            // -----------------------------------------------------------------
             DA.GetDataList<Point3d>("Closed Panel Area", iClosedPanelPts);
             DA.GetData<double>("Panel Effect Area", ref iClosePanelDist);
-            // -------------------------------------------------------------------
             DA.GetData<bool>("Auto Gen Plates", ref iAutoGenPlates);
             DA.GetData<double>("Plate Offset", ref iPlatesOffset);
             DA.GetData<double>("Threads", ref iPlatesThreads);
@@ -183,7 +178,7 @@ namespace Pavillion2015
 
                 if (iHeightThickness)  // adding z coordinate as account
                 {
-                    double k = vertexPosition.Z * 0.125; 
+                    double k = vertexPosition.Z * 0.125;
                     distValue *= k * iMinThickness + (0.5 - k) * iMaxThickness;
                 }
                 othickness.Add(distValue);
@@ -197,13 +192,13 @@ namespace Pavillion2015
                 oInfo += "i = " + i.ToString() + ", value = " + oVertexPanel2[i] + "\n";
                 foreach (int n in vt.NeighborVertexIndices)
                 {
-                    //if (oVertexPanel2[n] == true)
-                    //{
-                    oInfo += "n = " + n.ToString() + ", value = " + oVertexPanel2[n] + "\n";
-                        //oInfo += n.ToString() + " get it \n";
-                        //double temp = othickness[n];
-                        //othickness[i] = temp;
-                    //}
+                    if (oVertexPanel2[n] == true)
+                    {
+                        oInfo += "n = " + n.ToString() + ", value = " + oVertexPanel2[n] + "\n";
+                        oInfo += n.ToString() + " get it \n";
+                        double temp = othickness[n];
+                        othickness[i] = temp;
+                    }
                 }
                 oInfo += "==============================\n";
             }
@@ -414,7 +409,7 @@ namespace Pavillion2015
                 int firstIndex = iRhinoMesh.TopologyVertices.MeshVertexIndices(indexPair.I)[0];
                 int secondIndex = iRhinoMesh.TopologyVertices.MeshVertexIndices(indexPair.J)[0];
 
-                
+
                 if (connectedFacesIndex.Length == 2)
                 {
                     firstTriIndex = connectedFacesIndex[0];
@@ -468,7 +463,7 @@ namespace Pavillion2015
                         oSpringMesh.Triangles[secondTriIndex].FirstAdjTriIndex = firstTriIndex;
                     }
                     if (triangleAdj02 == vertex12)
-                    { 
+                    {
                         oSpringMesh.Triangles[secondTriIndex].SecondEdgeIndex = i;
                         oSpringMesh.Triangles[secondTriIndex].SecondAdjTriIndex = firstTriIndex;
                     }
@@ -507,7 +502,7 @@ namespace Pavillion2015
                     if (triangleAdj01 == vertex03)
                         oSpringMesh.Triangles[firstTriIndex].ThirdEdgeIndex = i;
                 }
-                
+
             }
 
             // visualize springMesh
