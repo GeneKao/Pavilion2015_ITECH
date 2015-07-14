@@ -312,7 +312,15 @@ namespace Pavillion2015.Gene_UpdatedCode
                         (iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == true)) half_dualLoop_type_1(i);
 
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
-                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] != false || iVertexStatus[edgeLocal.SecondAdjacentVertexIndex] != false) )
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == true && iVertexStatus[edgeLocal.SecondAdjacentVertexIndex] == false))
+                        half_dualLoop_type_2(i, tri01, tri02);
+
+                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == false && iVertexStatus[edgeLocal.SecondAdjacentVertexIndex] == true))
+                        half_dualLoop_type_2(i, tri02, tri01);
+
+                    if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == true && iVertexStatus[edgeLocal.SecondAdjacentVertexIndex] == true))
                     {
                         half_dualLoop_type_2(i, tri01, tri02);
                         half_dualLoop_type_2(i, tri02, tri01);
@@ -321,7 +329,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 else
                 {
                     if ((iVertexStatus[vertex01] == false && iVertexStatus[vertex02] == false) &&
-                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == true) )
+                        (iVertexStatus[edgeLocal.FirstAdjacentVertexIndex] == true))
                     {
                         half_dualLoop_type_2(i, tri01, -1); // give it -1 if no neighbour
                     }
@@ -468,7 +476,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                                 );
                             if (brep.Length > 0)
                             {
-                                oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l+3]));
+                                oDualLoop1.Add(brep[0], path.AppendElement(leftIndex[l + 3]));
                                 oDualLoop1ID.Add("H;" + rightTriIndex.ToString() + "-" + leftTriIndex.ToString() + ";" + plateID.ToString(), path.AppendElement(leftIndex[l + 3]));
 
                                 oDualLoop1Curves.Add(left, path.AppendElement(leftIndex[l + 3]));
@@ -650,7 +658,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             right1.Append(right1PlanarDown);*/
             Curve right1 = Curve.JoinCurves(new List<Curve>() { right1PlanarDown, right1Loop, right1PlanarUp }, documentTolerance, true)[0];
 
-            if (iPolySrf) 
+            if (iPolySrf)
             {
                 right1 = right1Loop;
             }
@@ -905,7 +913,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                 distValue = ICD.Utils.Distance(v.Position, closestPt);
                 verticesValues.Add(distValue);
             }
-            
+
             // remap
             double max = verticesValues.Max();
             double min = verticesValues.Min();
@@ -1263,7 +1271,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             foreach (Point3d pt in EffectorHoleBottom)
                 oTriLoopEffectorHoles.Add(pt, path.AppendElement(item).AppendElement(0));
         }
-        
+
         private List<Point3d> EffectorHoles(Point3d a, Point3d b, Point3d c, Point3d m, Point3d oab, Point3d oac, int idx)
         {
             double distance1 = 0.075;
@@ -1275,8 +1283,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // check distance to end-of-planarity-line
             Vector3d v_toPlanarLine = (0.5 * (oac + oab)) - m;
-            
-            if(v_toPlanarLine.Length < 0.145)
+
+            if (v_toPlanarLine.Length < 0.145)
             {
                 distance1 = 0.035;
                 distance2 = 0.075;
@@ -1291,7 +1299,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 v_am = c - m;
                 v_am.Unitize();
-                v_am.Rotate(angleRadians, normal); 
+                v_am.Rotate(angleRadians, normal);
             }
 
             // for 3rd Stripe
@@ -1299,7 +1307,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 v_am = b - m;
                 v_am.Unitize();
-                v_am.Rotate((2 * angleRadians), normal); 
+                v_am.Rotate((2 * angleRadians), normal);
             }
 
             Point3d pt1 = m + (v_am * distance1);

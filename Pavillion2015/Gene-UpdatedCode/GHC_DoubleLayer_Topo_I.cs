@@ -193,9 +193,9 @@ namespace Pavillion2015
             for (int i = 0; i < oSpringMesh.Vertices.Count; i++)
             {
                 Vertex v = oSpringMesh.Vertices[i];
-                List<int> Neighbours = v.NeighborVertexIndices.ToList();
+                //List<int> Neighbours = v.NeighborVertexIndices;
                 oInfo += "i = " + i.ToString() + ", value = " + oVertexPanel2[i] + "\n";
-                foreach ( int n in Neighbours)
+                foreach (int n in v.NeighborVertexIndices)
                 {
                     //if (oVertexPanel2[n] == true)
                     //{
