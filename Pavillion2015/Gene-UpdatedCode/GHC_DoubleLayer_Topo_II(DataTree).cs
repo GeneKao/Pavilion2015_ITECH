@@ -366,6 +366,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             double planarOffset = planarVerticesValues[vertex];
             double scaler = curveVerticesValues[vertex];
+            double openingScalar = openingWidthVerticesValues[vertex];
 
             //Calculate offset planar points
             Vector3d v_oRightUp01 = up03 - rightUp01;
@@ -378,6 +379,17 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d rightUp02 = (1 - scaler) * oRightUp01 + (scaler) * up03;
             Point3d leftUp02 = (1 - scaler) * oLeftUp01 + (scaler) * up03;
+
+            // normalise hohles
+            Point3d openingRightUp02 = up03 + (openingScalar * v_oRightUp01 * -1);
+            Point3d openingLeftUp02 = up03 + (openingScalar * v_oLeftUp01 * -1);
+
+            if (new Vector3d(rightUp02 - up03).Length > openingScalar)
+                rightUp02 = openingRightUp02;
+
+            if (new Vector3d(leftUp02 - up03).Length > openingScalar)
+                leftUp02 = openingLeftUp02;
+            // end normalise hohles
 
             // layer down
             Point3d rightDown01 = bottomCenterPts[rightTriIndex];
@@ -396,6 +408,17 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d rightDown02 = (1 - scaler) * oRightDown01 + (scaler) * down03;
             Point3d leftDown02 = (1 - scaler) * oLeftDown01 + (scaler) * down03;
+
+            // normalise hohles
+            Point3d openingRightDown02 = down03 + (openingScalar * v_oRightDownp01 * -1);
+            Point3d openingLeftDown02 = down03 + (openingScalar * v_oLeftDown01 * -1);
+
+            if (new Vector3d(rightDown02 - down03).Length > openingScalar)
+                rightDown02 = openingRightDown02;
+
+            if (new Vector3d(leftDown02 - down03).Length > openingScalar)
+                leftDown02 = openingLeftDown02;
+            // end normalise hohles
 
             //Pointiness
             Point3d maxVertexPt = iSpringMesh.Vertices[vertex].Position;
@@ -567,8 +590,12 @@ namespace Pavillion2015.Gene_UpdatedCode
             double planarOffset1 = planarVerticesValues[vertex1];
             double planarOffset2 = planarVerticesValues[vertex2];
 
+            double openingScalar1 = openingWidthVerticesValues[vertex1];
+            double openingScalar2 = openingWidthVerticesValues[vertex2];
+
             //---- TriLoop Side UP -----------------------------------------------
             #region TriLoop Side UP
+
             Point3d vertexPtUp1 = topCps[vertex1];
             Point3d vertexPtUp2 = topCps[vertex2];
             Point3d vertexPtUpM = 0.5 * (vertexPtUp1 + vertexPtUp2);
@@ -580,9 +607,21 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d oVertexPtUpM1 = vertexPtUpM + (v_vertexPtUp1 * planarOffset1);
             Point3d oVertexPtUpM2 = vertexPtUpM + (v_vertexPtUp2 * planarOffset2);
-
+            
             Point3d ctPtUp1 = (scaler1) * vertexPtUp1 + (1 - scaler1) * oVertexPtUpM1;
             Point3d ctPtUp2 = (scaler2) * vertexPtUp2 + (1 - scaler2) * oVertexPtUpM2;
+            
+            // normalise hohles
+            Point3d openingCtPtUp1 = vertexPtUp1 + (openingScalar1 * v_vertexPtUp1 * -1);
+            Point3d openingCtPtUp2 = vertexPtUp2 + (openingScalar2 * v_vertexPtUp2 * -1);
+
+            if (new Vector3d(ctPtUp1 - vertexPtUp1).Length > openingScalar1)
+                ctPtUp1 = openingCtPtUp1;
+
+            if (new Vector3d(ctPtUp2 - vertexPtUp2).Length > openingScalar2)
+                ctPtUp2 = openingCtPtUp2;
+            // end normalise hohles
+
             #endregion TriLoop Side UP
 
             //---- TriLoop Side Down -----------------------------------------------
@@ -601,6 +640,18 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d ctPtDown1 = (scaler1) * vertexPtDown1 + (1 - scaler1) * oVertexPtDownM1;
             Point3d ctPtDown2 = (scaler2) * vertexPtDown2 + (1 - scaler2) * oVertexPtDownM2;
+
+            // normalise hohles
+            Point3d openingCtPtDown1 = vertexPtDown1 + (openingScalar1 * v_vertexPtDown1 * -1);
+            Point3d openingCtPtDown2 = vertexPtDown2 + (openingScalar2 * v_vertexPtDown2 * -1);
+
+            if (new Vector3d(ctPtDown1 - vertexPtDown1).Length > openingScalar1)
+                ctPtDown1 = openingCtPtDown1;
+
+            if (new Vector3d(ctPtDown2 - vertexPtDown2).Length > openingScalar2)
+                ctPtDown2 = openingCtPtDown2;
+            // end normalise hohles
+
             #endregion TriLoop Side Down
 
             //---- Plate Side UP -------------------------------------------------
@@ -617,6 +668,18 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d ctUpTPI1 = (scaler1) * vertexPtUp1 + (1 - scaler1) * oUpTPI01;
             Point3d ctUpTPI2 = (scaler2) * vertexPtUp2 + (1 - scaler2) * oUpTPI02;
+
+            // normalise hohles
+            Point3d openingCtUpTPI1 = vertexPtUp1 + (openingScalar1 * v_vertexPtUp1_upTPI * -1);
+            Point3d openingCtUpTPI2 = vertexPtUp2 + (openingScalar2 * v_vertexPtUp2_upTPI * -1);
+
+            if (new Vector3d(ctUpTPI1 - vertexPtUp1).Length > openingScalar1)
+                ctUpTPI1 = openingCtUpTPI1;
+
+            if (new Vector3d(ctUpTPI2 - vertexPtUp2).Length > openingScalar2)
+                ctUpTPI2 = openingCtUpTPI2;
+            // end normalise hohles
+
             #endregion Plate Side UP
 
             //---- Plate Side DOWN -----------------------------------------------
@@ -633,6 +696,18 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             Point3d ctDownTPI1 = (scaler1) * vertexPtDown1 + (1 - scaler1) * oDownTPI01;
             Point3d ctDownTPI2 = (scaler2) * vertexPtDown2 + (1 - scaler2) * oDownTPI02;
+
+            // normalise hohles
+            Point3d openingCtDownTPI1 = vertexPtDown1 + (openingScalar1 * v_vertexPtUp1_downTPI * -1);
+            Point3d openingCtDownTPI2 = vertexPtDown2 + (openingScalar2 * v_vertexPtUp2_downTPI * -1);
+
+            if (new Vector3d(ctDownTPI1 - vertexPtDown1).Length > openingScalar1)
+                ctDownTPI1 = openingCtDownTPI1;
+
+            if (new Vector3d(ctDownTPI2 - vertexPtDown2).Length > openingScalar2)
+                ctDownTPI2 = openingCtDownTPI2;
+            // end normalise hohles
+
             #endregion Plate Side DOWN
 
             //---- Curves Right 1 -----------------------------------------------------------
@@ -690,7 +765,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             if (iPolySrf)
             {
-                //left1 = left1Loop;
+                left1 = left1Loop;
             }
 
             #endregion Curves Left 1
