@@ -29,7 +29,8 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<bool> iVertexPanel2 = null;
         double iPlanarOffsetScaleMin = double.NaN;
         double iPlanarOffsetScaleMax = double.NaN;
-        double CurvePointiness = double.NaN;
+        double CurvePointinessMin = double.NaN;
+        double CurvePointinessMax = double.NaN;
 
         double iOpeningWidthMin = double.NaN;
         double iOpeningWidthMax = double.NaN;
@@ -67,6 +68,7 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<double> curveVerticesValues = null;  // relative offset factors for individual opnening sizes (remaped verticesValues to iTangentScaleMin - iTangentScaleMax - range)
         List<double> planarVerticesValues = null;  // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
         List<double> openingWidthVerticesValues = null;  // offset distance in document unit for individual opening widths
+        List<double> pointinessValues = null;  // offset distance in document unit for individual opening widths
 
         double documentTolerance = DocumentTolerance();
         int curveDegree = 2;   // here change curve degree
@@ -90,7 +92,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddBooleanParameter("Allow PolySrf", "Allow PolySrf", "Allow PolySrf", GH_ParamAccess.item, true);
             pManager.AddNumberParameter("TangentScale Min", "TangentScale Min", "TangentScale Min [relative]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("TangentScale Max", "TangentScale Max", "TangentScale Max [relative]", GH_ParamAccess.item, 0.8);
-            pManager.AddNumberParameter("Curve Pointiness", "Pointiness", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Curve Pointiness Min", "Pointiness Min", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
+            pManager.AddNumberParameter("Curve Pointiness Max", "Pointiness Max", "Pointiness of the bended Surfaces [relative]", GH_ParamAccess.item, 1.0);
             pManager.AddNumberParameter("PlanarOffset Min", "PlanarOffset Min", "Controlls minimal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("PlanarOffset Max", "PlanarOffset Max", "Controlls maximal offset of planar parts [in doc. units]", GH_ParamAccess.item, 0.8);
             pManager.AddPointParameter("Attractors", "Attractors", "Attractors", GH_ParamAccess.list, new Point3d(10000, 10000, 10000));
@@ -164,6 +167,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             curveVerticesValues = new List<double>();
             planarVerticesValues = new List<double>();
             openingWidthVerticesValues = new List<double>();
+            pointinessValues = new List<double>();
+
 
         }
 
@@ -183,7 +188,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetDataList<bool>("Vertex Panel2", iVertexPanel2);
             DA.GetData<double>("PlanarOffset Min", ref iPlanarOffsetScaleMin);
             DA.GetData<double>("PlanarOffset Max", ref iPlanarOffsetScaleMax);
-            DA.GetData<double>("Curve Pointiness", ref CurvePointiness);
+            DA.GetData<double>("Curve Pointiness Min", ref CurvePointinessMin);
+            DA.GetData<double>("Curve Pointiness Max", ref CurvePointinessMax);
 
             DA.GetData<double>("Opening Width Min", ref iOpeningWidthMin);
             DA.GetData<double>("Opening Width Max", ref iOpeningWidthMax);
@@ -360,6 +366,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             double planarOffset = planarVerticesValues[vertex];
             double scaler = curveVerticesValues[vertex];
             double openingScalar = openingWidthVerticesValues[vertex];
+            double curvePointiness = pointinessValues[vertex];
 
             //Calculate offset planar points
             Vector3d v_oRightUp01 = up03 - rightUp01;
@@ -417,8 +424,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d maxVertexPt = iSpringMesh.Vertices[vertex].Position;
             Point3d min_rightVertexPt = 0.5 * (rightUp02 + rightDown02);
             Point3d min_leftVertexPt = 0.5 * (leftUp02 + leftDown02);
-            Point3d rightVertexPt = (CurvePointiness * maxVertexPt) + ((1 - CurvePointiness) * min_rightVertexPt);
-            Point3d leftVertexPt = (CurvePointiness * maxVertexPt) + ((1 - CurvePointiness) * min_leftVertexPt);
+            Point3d rightVertexPt = (curvePointiness * maxVertexPt) + ((1 - curvePointiness) * min_rightVertexPt);
+            Point3d leftVertexPt = (curvePointiness * maxVertexPt) + ((1 - curvePointiness) * min_leftVertexPt);
 
 
             // Right Curves (Curved Curve, Planar Part Curve at Top, Planar Part Curve at Bottom, Joined Curve)
@@ -666,6 +673,10 @@ namespace Pavillion2015.Gene_UpdatedCode
             double openingScalar1 = openingWidthVerticesValues[vertex1];
             double openingScalar2 = openingWidthVerticesValues[vertex2];
 
+            double curvePointiness1 = pointinessValues[vertex1];
+            double curvePointiness2 = pointinessValues[vertex2];
+
+
             //---- TriLoop Side UP -----------------------------------------------
             #region TriLoop Side UP
 
@@ -788,7 +799,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Pointiness of the Surface
             Point3d min_vertexPtRight1 = 0.5 * (ctUpTPI1 + ctDownTPI1);
-            Point3d vertexPtRight1 = (CurvePointiness * vertexPt1) + ((1 - CurvePointiness) * min_vertexPtRight1);
+            Point3d vertexPtRight1 = (curvePointiness1 * vertexPt1) + ((1 - curvePointiness1) * min_vertexPtRight1);
 
 
             Curve right1Loop = Curve.CreateControlPointCurve(
@@ -818,7 +829,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Pointiness of the Surface
             Point3d min_vertexPtLeft1 = 0.5 * (ctPtUp1 + ctPtDown1);
-            Point3d vertexPtLeft1 = (CurvePointiness * vertexPt1) + ((1 - CurvePointiness) * min_vertexPtLeft1);
+            Point3d vertexPtLeft1 = (curvePointiness1 * vertexPt1) + ((1 - curvePointiness1) * min_vertexPtLeft1);
 
             Curve left1Loop = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oVertexPtDownM1, ctPtDown1, vertexPtLeft1, ctPtUp1, oVertexPtUpM1 }, curveDegree);
@@ -849,7 +860,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Pointiness of the Surface
             Point3d min_vertexPtRight2 = 0.5 * (ctUpTPI2 + ctDownTPI2);
-            Point3d vertexPtRight2 = (CurvePointiness * vertexPt2) + ((1 - CurvePointiness) * min_vertexPtRight2);
+            Point3d vertexPtRight2 = (curvePointiness2 * vertexPt2) + ((1 - curvePointiness2) * min_vertexPtRight2);
 
             Curve right2Loop = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oDownTPI02, ctDownTPI2, vertexPtRight2, ctUpTPI2, oUpTPI02 }, curveDegree);
@@ -879,7 +890,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Pointiness of the Surface
             Point3d min_vertexPtLeft2 = 0.5 * (ctPtUp2 + ctPtDown2);
-            Point3d vertexPtLeft2 = (CurvePointiness * vertexPt2) + ((1 - CurvePointiness) * min_vertexPtLeft2);
+            Point3d vertexPtLeft2 = (curvePointiness2 * vertexPt2) + ((1 - curvePointiness2) * min_vertexPtLeft2);
 
             Curve left2Loop = Curve.CreateControlPointCurve(
                 new List<Point3d>() { oVertexPtDownM2, ctPtDown2, vertexPtLeft2, ctPtUp2, oVertexPtUpM2 }, curveDegree);
@@ -1165,10 +1176,24 @@ namespace Pavillion2015.Gene_UpdatedCode
             // ---- remap curveVerticesValues ------------------------------------------------------------------
             for (int i = 0; i < verticesValues.Count; i++)
             {
-                double remapedValue = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
-                curveVerticesValues.Add(remapedValue);
+                // ---- remap curveVerticesValues ------------------------------------------------------------------
+                double remapedValue0 = iTangentScaleMin + (verticesValues[i] - min) * (iTangentScaleMax - iTangentScaleMin) / (max - min);
+                curveVerticesValues.Add(remapedValue0);
+
+                // ---- remap planarVerticesValues ------------------------------------------------------------------
+                double remapedValue1 = iPlanarOffsetScaleMin + (verticesValues[i] - min) * (iPlanarOffsetScaleMax - iPlanarOffsetScaleMin) / (max - min);
+                planarVerticesValues.Add(remapedValue1);
+
+                // ---- remap openingWidthVerticesValues ------------------------------------------------------------------
+                double remapedValue2 = iOpeningWidthMin + (verticesValues[i] - min) * (iOpeningWidthMax - iOpeningWidthMin) / (max - min);
+                openingWidthVerticesValues.Add(remapedValue2);
+
+                // ---- remap openingWidthVerticesValues ------------------------------------------------------------------
+                double remapedValue3 = CurvePointinessMin + (verticesValues[i] - min) * (CurvePointinessMax - CurvePointinessMin) / (max - min);
+                pointinessValues.Add(remapedValue3);
             }
 
+            /*
             // ---- remap planarVerticesValues ------------------------------------------------------------------
             for (int i = 0; i < verticesValues.Count; i++)
             {
@@ -1182,6 +1207,14 @@ namespace Pavillion2015.Gene_UpdatedCode
                 double remapedValue = iOpeningWidthMin + (verticesValues[i] - min) * (iOpeningWidthMax - iOpeningWidthMin) / (max - min);
                 openingWidthVerticesValues.Add(remapedValue);
             }
+
+            // ---- remap openingWidthVerticesValues ------------------------------------------------------------------
+            for (int i = 0; i < verticesValues.Count; i++)
+            {
+                double remapedValue = CurvePointinessMin + (verticesValues[i] - min) * (CurvePointinessMax - CurvePointinessMin) / (max - min);
+                pointinessValues.Add(remapedValue);
+            }
+            */
         }
 
         private void triLoop()
@@ -1334,11 +1367,14 @@ namespace Pavillion2015.Gene_UpdatedCode
 
 
             // Pointiness of the Surface
+
+            double curvePointiness = pointinessValues[firstVertexIndex];
+
             Point3d max_aA = 0.5 * (a + A);
             Point3d min_aA1 = 0.5 * (aab + AAB);
             Point3d min_aA2 = 0.5 * (aac + AAC);
-            Point3d aA1 = (CurvePointiness * max_aA) + ((1 - CurvePointiness) * min_aA1);
-            Point3d aA2 = (CurvePointiness * max_aA) + ((1 - CurvePointiness) * min_aA2);
+            Point3d aA1 = (curvePointiness * max_aA) + ((1 - curvePointiness) * min_aA1);
+            Point3d aA2 = (curvePointiness * max_aA) + ((1 - curvePointiness) * min_aA2);
 
             // Create Curves
             Curve profileCurve1 = Curve.CreateControlPointCurve(new List<Point3d>() { oab, aab, aA1, AAB, oAB }, curveDegree);
