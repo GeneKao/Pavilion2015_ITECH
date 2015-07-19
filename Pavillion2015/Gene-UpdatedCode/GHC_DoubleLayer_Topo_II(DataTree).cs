@@ -105,8 +105,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddBooleanParameter("Vertex Panel2", "Vertex Panel2", "Vertex Panel2", GH_ParamAccess.list);
             pManager.AddNumberParameter("Opening Width Min", "OpeningWidth Min", "TangentScale Min [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("Opening Width Max", "OpeningWidth Max", "TangentScale Max [in doc. units]", GH_ParamAccess.item, 0.8);
-
             pManager.AddNumberParameter("Manual Adjustments", "Manual Adjustments", "Tree of manual adjusted input data for selected verteices", GH_ParamAccess.tree);
+            pManager.AddIntegerParameter("Curve Degree", "CurveDegree", "Curve Degree", GH_ParamAccess.item, 2);
 
         }
 
@@ -204,6 +204,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetData<double>("Opening Width Min", ref iOpeningWidthMin);
             DA.GetData<double>("Opening Width Max", ref iOpeningWidthMax);
             DA.GetDataTree<GH_Number>("Manual Adjustments", out ManualValueTree);
+            DA.GetData<int>("Curve Degree", ref curveDegree);
             //------------------------------------------------------------
 
             // get all Vertex indexies that are manual adjusted
