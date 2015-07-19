@@ -35,6 +35,9 @@ namespace Pavillion2015.Gene_UpdatedCode
         double iOpeningWidthMin = double.NaN;
         double iOpeningWidthMax = double.NaN;
 
+        GH_Structure<GH_Number> ManualValueTree = null;
+
+
         // output
         string oInfo = string.Empty;
         List<Vector3d> oDebugList = null;
@@ -69,10 +72,12 @@ namespace Pavillion2015.Gene_UpdatedCode
         List<double> planarVerticesValues = null;  // offset distance in document unit for individual planar part sizes (remaped verticesValues to iPlanarOffsetScaleMin - iPlanarOffsetScaleMax - range)
         List<double> openingWidthVerticesValues = null;  // offset distance in document unit for individual opening widths
         List<double> pointinessValues = null;  // offset distance in document unit for individual opening widths
+        List<int> ManualAdjustedVertexIndexies = null;
 
         double documentTolerance = DocumentTolerance();
         int curveDegree = 2;   // here change curve degree
 
+        
 
         public GHC_DoubleLayer_Topo_II_DataTree_()
             : base("Double Layer Topo - II DT", "Double Layer Topo - II DT",
@@ -100,6 +105,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddBooleanParameter("Vertex Panel2", "Vertex Panel2", "Vertex Panel2", GH_ParamAccess.list);
             pManager.AddNumberParameter("Opening Width Min", "OpeningWidth Min", "TangentScale Min [in doc. units]", GH_ParamAccess.item, 0.2);
             pManager.AddNumberParameter("Opening Width Max", "OpeningWidth Max", "TangentScale Max [in doc. units]", GH_ParamAccess.item, 0.8);
+
+            pManager.AddNumberParameter("Manual Adjustments", "Manual Adjustments", "Tree of manual adjusted input data for selected verteices", GH_ParamAccess.tree);
 
         }
 
@@ -135,6 +142,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             iThickness = new List<double>();
             iAttractors = new List<Point3d>();
             iVertexPanel2 = new List<bool>();
+            //ManualValueTree = new GH_Structure<GH_Number>();
+
 
             // output
             oInfo = string.Empty;
@@ -168,6 +177,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             planarVerticesValues = new List<double>();
             openingWidthVerticesValues = new List<double>();
             pointinessValues = new List<double>();
+            ManualAdjustedVertexIndexies = new List<int>();
 
 
         }
@@ -193,7 +203,13 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             DA.GetData<double>("Opening Width Min", ref iOpeningWidthMin);
             DA.GetData<double>("Opening Width Max", ref iOpeningWidthMax);
+            DA.GetDataTree<GH_Number>("Manual Adjustments", out ManualValueTree);
             //------------------------------------------------------------
+
+            // get all Vertex indexies that are manual adjusted
+            for (int i = 0; i < ManualValueTree.Branches.Count; i++)
+            { ManualAdjustedVertexIndexies.Add(ManualValueTree.Paths[i].Indices[0]); }
+
 
             storePlatesTPI();
 
@@ -1274,6 +1290,20 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // perform planar Offset
             double planarOffset = planarVerticesValues[firstVertexIndex];
+            double curveScaler = curveVerticesValues[firstVertexIndex];
+            double openingScaler = openingWidthVerticesValues[firstVertexIndex];
+            double curvePointiness = pointinessValues[firstVertexIndex];
+
+            if (ManualAdjustedVertexIndexies.Contains(firstVertexIndex))
+            {
+                GH_Path pth = new GH_Path(firstVertexIndex);
+
+                planarOffset = ManualValueTree[new GH_Path(firstVertexIndex)][2].Value;
+                curveScaler = ManualValueTree[new GH_Path(firstVertexIndex)][0].Value;
+                openingScaler = ManualValueTree[new GH_Path(firstVertexIndex)][3].Value;
+                curvePointiness = ManualValueTree[new GH_Path(firstVertexIndex)][1].Value;
+
+            }
 
             // Offset : Centre of Edge AB
             Vector3d v_ab = a - b;
@@ -1314,15 +1344,7 @@ namespace Pavillion2015.Gene_UpdatedCode
                           
             */
             #endregion correct offset
-            // not used
-            #region Easy Offset
-            /*
-            v_ab *= planarOffset;
-            v_AB *= planarOffset;
-            v_ac *= planarOffset;
-            v_AC *= planarOffset;
-            */
-            #endregion Easy Offset
+
 
 
             // create offset point 
@@ -1334,7 +1356,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d oAC = AC + (v_AC * planarOffset);
 
 
-            double curveScaler = curveVerticesValues[firstVertexIndex];
 
             Point3d AAB = curveScaler * A + (1.0 - curveScaler) * oAB;
             Point3d aab = curveScaler * a + (1.0 - curveScaler) * oab;
@@ -1343,7 +1364,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d aac = curveScaler * a + (1.0 - curveScaler) * oac;
 
 
-            double openingScaler = openingWidthVerticesValues[firstVertexIndex];
 
             Point3d openingAAB = (-1 * v_AB * openingScaler) + A;
             Point3d openingaab = (-1 * v_ab * openingScaler) + a;
@@ -1368,7 +1388,6 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             // Pointiness of the Surface
 
-            double curvePointiness = pointinessValues[firstVertexIndex];
 
             Point3d max_aA = 0.5 * (a + A);
             Point3d min_aA1 = 0.5 * (aab + AAB);
