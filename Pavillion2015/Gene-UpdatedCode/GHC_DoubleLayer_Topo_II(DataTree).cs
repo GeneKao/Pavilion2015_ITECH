@@ -37,6 +37,8 @@ namespace Pavillion2015.Gene_UpdatedCode
 
         GH_Structure<GH_Number> ManualValueTree = null;
 
+        double iGroundPos = double.NaN;
+
 
         // output
         string oInfo = string.Empty;
@@ -107,6 +109,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddNumberParameter("Opening Width Max", "OpeningWidth Max", "TangentScale Max [in doc. units]", GH_ParamAccess.item, 0.8);
             pManager.AddNumberParameter("Manual Adjustments", "Manual Adjustments", "Tree of manual adjusted input data for selected verteices", GH_ParamAccess.tree);
             pManager.AddIntegerParameter("Curve Degree", "CurveDegree", "Curve Degree", GH_ParamAccess.item, 2);
+            pManager.AddNumberParameter("Ground Level", "Ground Level", "Ground Level", GH_ParamAccess.item, 0.05);
 
         }
 
@@ -205,6 +208,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetData<double>("Opening Width Max", ref iOpeningWidthMax);
             DA.GetDataTree<GH_Number>("Manual Adjustments", out ManualValueTree);
             DA.GetData<int>("Curve Degree", ref curveDegree);
+            DA.GetData<double>("Ground Level", ref iGroundPos);
             //------------------------------------------------------------
 
             // get all Vertex indexies that are manual adjusted
@@ -1125,8 +1129,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 if (edge.SecondTriangleIndex >= 0) continue;
                 // Gene Added
-                if (iSpringMesh.Vertices[edge.FirstVertexIndex].Position.Z > 0.05 &&
-                     iSpringMesh.Vertices[edge.SecondVertexIndex].Position.Z > 0.05) continue;
+                if (iSpringMesh.Vertices[edge.FirstVertexIndex].Position.Z > iGroundPos &&
+                     iSpringMesh.Vertices[edge.SecondVertexIndex].Position.Z > iGroundPos) continue;
 
                 Vector3d vertexNormal = vertexNormals[edge.FirstVertexIndex];
                 vertexNormal.Z = 0.0;
