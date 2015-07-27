@@ -1240,7 +1240,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 GH_Path path = new GH_Path(tri);
                 //oInfo += "path = " + path.ToString() + "\n";
-
                 Triangle triangle = iSpringMesh.Triangles[tri];
 
                 if (!iVertexStatus[triangle.FirstVertexIndex] &&
@@ -1590,27 +1589,31 @@ namespace Pavillion2015.Gene_UpdatedCode
             }
 
             // for 1st stipe (main stripe)
-            Vector3d v_am = a - m;
-            v_am.Unitize();
+            //Vector3d vectorMain = a - m;
+            Vector3d vectorMain = ((a + b) * 0.5) - m;      // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
+            vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+            vectorMain.Unitize();
 
             // for 2nd Stripe
             if (idx == 1)
             {
-                v_am = c - m;
-                v_am.Unitize();
-                v_am.Rotate(angleRadians, normal);
+                vectorMain = ((a + c) * 0.5) - m;               // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
+                vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+                vectorMain.Unitize();
+                vectorMain.Rotate(angleRadians, normal);
             }
 
             // for 3rd Stripe
             else if (idx == 2)
             {
-                v_am = b - m;
-                v_am.Unitize();
-                v_am.Rotate((2 * angleRadians), normal);
+                vectorMain = ((b + c) * 0.5) - m;               // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
+                vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+                vectorMain.Unitize();
+                vectorMain.Rotate((2 * angleRadians), normal);
             }
 
-            Point3d pt1 = m + (v_am * distance1);
-            Point3d pt2 = m + (v_am * distance2);
+            Point3d pt1 = m + (vectorMain * distance1);
+            Point3d pt2 = m + (vectorMain * distance2);
 
             effectorHoles.Add(pt1);
             effectorHoles.Add(pt2);
