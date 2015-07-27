@@ -218,9 +218,10 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             storePlatesTPI();
 
+            calculateVerticesValues();
             calculateVertexNormals();
             calculateVertexCps();
-            calculateVerticesValues();
+            //calculateVerticesValues();
 
             triLoop();
 
@@ -1149,13 +1150,14 @@ namespace Pavillion2015.Gene_UpdatedCode
             {
                 Vertex vt = iSpringMesh.Vertices[i];
                 foreach (int n in vt.NeighborVertexIndices)
-                {
                     if (iVertexPanel2[n] == true)
                     {
                         Vector3d temp = vertexNormals[n];
                         vertexNormals[i] = temp;
+
+                        double tempN = verticesValues[n];
+                        verticesValues[i] = tempN; 
                     }
-                }
             }
         }
 
