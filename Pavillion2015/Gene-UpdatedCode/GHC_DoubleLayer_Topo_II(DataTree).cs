@@ -38,6 +38,8 @@ namespace Pavillion2015.Gene_UpdatedCode
         GH_Structure<GH_Number> ManualValueTree = null;
 
         double iGroundPos = double.NaN;
+        bool iSuperNormalization = false;
+
 
 
         // output
@@ -110,6 +112,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             pManager.AddNumberParameter("Manual Adjustments", "Manual Adjustments", "Tree of manual adjusted input data for selected verteices", GH_ParamAccess.tree);
             pManager.AddIntegerParameter("Curve Degree", "CurveDegree", "Curve Degree", GH_ParamAccess.item, 2);
             pManager.AddNumberParameter("Ground Level", "Ground Level", "Ground Level", GH_ParamAccess.item, 0.05);
+            pManager.AddBooleanParameter("Super Normalization", "SuperNormalization", "SuperNormalization", GH_ParamAccess.item, false);
+
 
         }
 
@@ -209,6 +213,8 @@ namespace Pavillion2015.Gene_UpdatedCode
             DA.GetDataTree<GH_Number>("Manual Adjustments", out ManualValueTree);
             DA.GetData<int>("Curve Degree", ref curveDegree);
             DA.GetData<double>("Ground Level", ref iGroundPos);
+
+            DA.GetData<bool>("Super Normalization", ref iSuperNormalization);
             //------------------------------------------------------------
 
             // get all Vertex indexies that are manual adjusted
@@ -1278,8 +1284,6 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d c = bottomCps[thirdVertexIndex];
             Point3d C = topCps[thirdVertexIndex];
 
-
-
             // Centre of Edge AB
             Point3d ab = 0.5 * (a + b);
             Point3d AB = 0.5 * (A + B);
@@ -1361,6 +1365,35 @@ namespace Pavillion2015.Gene_UpdatedCode
             Point3d oac = ac + (v_ac * planarOffset);
             Point3d oAC = AC + (v_AC * planarOffset);
 
+            //---- Super normalization of Offset Points ----------------------------------------------------------------------------
+
+            // shortest connected Edge (changes offset point; normalize offset point)
+            if (iSuperNormalization == true)
+            {
+                List<int> neighbourVertices = iSpringMesh.Vertices[firstVertexIndex].NeighborVertexIndices;
+                double minimalLengthTop = 999999999999;
+                double minimalLengthBottom = 9999999999999;
+
+                foreach (int i in neighbourVertices)
+                {
+                    Vector3d vectorBottom = bottomCps[firstVertexIndex] - bottomCps[i];
+                    Vector3d vectorTop = topCps[firstVertexIndex] - topCps[i];
+
+                    if (vectorBottom.Length * 0.5 < minimalLengthBottom)
+                        minimalLengthBottom = vectorBottom.Length * 0.5;
+
+                    if (vectorTop.Length * 0.5 < minimalLengthTop)
+                        minimalLengthTop = vectorTop.Length * 0.5;
+                }
+
+                oab = a - (v_ab * (minimalLengthBottom - planarOffset));
+                oAB = A - (v_AB * (minimalLengthTop - planarOffset));
+
+                oac = a - (v_ac * (minimalLengthBottom - planarOffset));
+                oAC = A - (v_AC * (minimalLengthTop - planarOffset));
+            }
+
+            //---- End Super normalization of Offset Points ----------------------------------------------------------------------------
 
 
             Point3d AAB = curveScaler * A + (1.0 - curveScaler) * oAB;
