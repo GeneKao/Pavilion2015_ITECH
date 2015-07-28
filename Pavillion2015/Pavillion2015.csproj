@@ -97,7 +97,7 @@
     <None Include="Tri-Loop %28Julian%29 - RhinoMesh\GHC_03_Sofistik.cs" />
     <None Include="Tri-Loop %28Julian%29 - RhinoMesh\GHC_04_Explode.cs" />
     <None Include="Tri-Loop %28Julian%29 - RhinoMesh\GHC_Sofistik_Point_Indexer.cs" />
-    <None Include="Tri-Loop %28Julian%29 - RhinoMesh\GHC_Unroller.cs" />
+    <Compile Include="Tri-Loop %28Julian%29 - RhinoMesh\GHC_Unroller.cs" />
     <None Include="Tri-Loop %28Julian%29 - RhinoMesh\Tri-Loop-Component.cs" />
     <None Include="Tri-Loop %28Julian%29 - RhinoMesh\Tri-Loop-Stripe.cs" />
   </ItemGroup>
