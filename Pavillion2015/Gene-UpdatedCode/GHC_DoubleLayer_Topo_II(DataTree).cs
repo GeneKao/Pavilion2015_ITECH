@@ -1134,7 +1134,7 @@ namespace Pavillion2015.Gene_UpdatedCode
 
             foreach (Edge edge in iSpringMesh.Edges)
             {
-                if (edge.SecondTriangleIndex == -1) continue;
+                if (edge.SecondTriangleIndex >= 0) continue;
                 // Gene Added
                 if (iSpringMesh.Vertices[edge.FirstVertexIndex].Position.Z > iGroundPos &&
                      iSpringMesh.Vertices[edge.SecondVertexIndex].Position.Z > iGroundPos) continue;
