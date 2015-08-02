@@ -1385,6 +1385,10 @@ namespace Pavillion2015.Gene_UpdatedCode
                     if (vectorTop.Length * 0.5 < minimalLengthTop)
                         minimalLengthTop = vectorTop.Length * 0.5;
                 }
+                //Test:
+                minimalLengthBottom = (minimalLengthTop + minimalLengthBottom) * 0.5;
+                minimalLengthTop = minimalLengthBottom;
+                //End Test
 
                 oab = a - (v_ab * (minimalLengthBottom - planarOffset));
                 oAB = A - (v_AB * (minimalLengthTop - planarOffset));
