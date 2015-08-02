@@ -1637,14 +1637,14 @@ namespace Pavillion2015.Gene_UpdatedCode
             // for 1st stipe (main stripe)
             //Vector3d vectorMain = a - m;
             Vector3d vectorMain = ((a + b) * 0.5) - m;      // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
-            vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+            vectorMain.Rotate(angleRadians / -2, normal);    // rotate 60° (requirement from robotic fabrication)
             vectorMain.Unitize();
 
             // for 2nd Stripe
             if (idx == 1)
             {
                 vectorMain = ((a + c) * 0.5) - m;               // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
-                vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+                vectorMain.Rotate(angleRadians / -2, normal);    // rotate 60° (requirement from robotic fabrication)
                 vectorMain.Unitize();
                 vectorMain.Rotate(angleRadians, normal);
             }
@@ -1653,7 +1653,7 @@ namespace Pavillion2015.Gene_UpdatedCode
             else if (idx == 2)
             {
                 vectorMain = ((b + c) * 0.5) - m;               // (a + b) * 0.5 == main seam between stripe 0 and stripe 1
-                vectorMain.Rotate(angleRadians / 2, normal);    // rotate 60° (requirement from robotic fabrication)
+                vectorMain.Rotate(angleRadians / -2, normal);    // rotate 60° (requirement from robotic fabrication)
                 vectorMain.Unitize();
                 vectorMain.Rotate((2 * angleRadians), normal);
             }
