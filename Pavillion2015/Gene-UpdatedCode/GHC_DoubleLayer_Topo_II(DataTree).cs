@@ -1162,7 +1162,10 @@ namespace Pavillion2015.Gene_UpdatedCode
                         vertexNormals[i] = temp;
 
                         double tempN = verticesValues[n];
-                        verticesValues[i] = tempN; 
+                        verticesValues[i] = tempN;
+
+                        double tempT = iThickness[n];
+                        iThickness[i] = tempT;
                     }
             }
         }
